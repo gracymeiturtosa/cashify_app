@@ -1,5 +1,5 @@
 name: cashify_app
-description: "A Flutter-based cashiering application for Ukay-Ukay stores, supporting desktop and mobile."
+description: "A Flutter-based cashiering application for general retail, supporting desktop and mobile."
 publish_to: 'none' # Prevents accidental publishing to pub.dev
 
 version: 1.0.0+1

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import 'dashboard_screen.dart';
@@ -39,9 +38,15 @@ class _LoginScreenState extends State<LoginScreen> {
               return Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
-                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+                  border: Border.all(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withOpacity(0.2)),
                   borderRadius: BorderRadius.circular(10.0),
-                  color: Theme.of(context).colorScheme.surface, // Lighter Base Dark
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surface, // Lighter Base Dark
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -83,7 +88,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 16.0),
                       Text(
                         authProvider.errorMessage!,
-                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFFA8200D)),
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodyMedium!
+                            .copyWith(color: const Color(0xFFA8200D)),
                       ),
                     ],
                     const SizedBox(height: 20.0),
@@ -91,24 +99,28 @@ class _LoginScreenState extends State<LoginScreen> {
                       onPressed: authProvider.isLoading
                           ? null
                           : () async {
-                        final success = await authProvider.login(
-                          _usernameController.text,
-                          _passwordController.text,
-                        );
-                        if (success && context.mounted) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const DashboardScreen()),
-                          );
-                        }
-                      },
+                              final success = await authProvider.login(
+                                _usernameController.text,
+                                _passwordController.text,
+                              );
+                              if (success && context.mounted) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const DashboardScreen()),
+                                );
+                              }
+                            },
                       child: authProvider.isLoading
                           ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(color: Color(0xFF163300)),
-                      )
-                          : Text('Login', style: Theme.of(context).textTheme.labelLarge),
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                  color: Color(0xFF163300)),
+                            )
+                          : Text('Login',
+                              style: Theme.of(context).textTheme.labelLarge),
                     ),
                   ],
                 ),

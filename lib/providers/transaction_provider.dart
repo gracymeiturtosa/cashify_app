@@ -80,15 +80,15 @@ class TransactionProvider with ChangeNotifier {
     }
 
     final existingItemIndex = _cart.indexWhere(
-          (item) => item['product'].id == product.id,
+      (item) => item['product'].id == product.id,
     );
     final currentQuantity =
-    existingItemIndex >= 0 ? _cart[existingItemIndex]['quantity'] : 0;
+        existingItemIndex >= 0 ? _cart[existingItemIndex]['quantity'] : 0;
     final totalRequestedQuantity = currentQuantity + quantity;
 
     if (totalRequestedQuantity > product.stock) {
       _errorMessage =
-      'Not enough stock for ${product.name} (Available: ${product.stock})';
+          'Not enough stock for ${product.name} (Available: ${product.stock})';
       notifyListeners();
       return false;
     }

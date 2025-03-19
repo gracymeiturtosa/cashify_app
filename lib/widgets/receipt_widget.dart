@@ -14,8 +14,7 @@ class ReceiptWidget extends StatelessWidget {
     doc.addPage(
       pw.Page(
         pageFormat: PdfPageFormat.a4,
-        build:
-            (pw.Context context) => pw.Column(
+        build: (pw.Context context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
@@ -38,19 +37,16 @@ class ReceiptWidget extends StatelessWidget {
             pw.SizedBox(height: 20),
             pw.Table.fromTextArray(
               headers: ['Product', 'Qty', 'Price', 'Subtotal'],
-              data:
-              (transactionDetails['cart'] as List<Map<String, dynamic>>)
+              data: (transactionDetails['cart'] as List<Map<String, dynamic>>)
                   .map((item) {
-                final subtotal =
-                    item['product'].price * item['quantity'];
+                final subtotal = item['product'].price * item['quantity'];
                 return [
                   item['product'].name,
                   item['quantity'].toString(),
                   '₱${item['product'].price.toStringAsFixed(2)}',
                   '₱${subtotal.toStringAsFixed(2)}',
                 ];
-              })
-                  .toList(),
+              }).toList(),
               headerStyle: pw.TextStyle(fontWeight: pw.FontWeight.bold),
               cellAlignment: pw.Alignment.centerRight,
               cellStyle: const pw.TextStyle(fontSize: 12),
@@ -87,8 +83,8 @@ class ReceiptWidget extends StatelessWidget {
             Text('Payment Method: ${transactionDetails['paymentMethod']}'),
             const SizedBox(height: 10),
             ...(transactionDetails['cart'] as List<Map<String, dynamic>>).map((
-                item,
-                ) {
+              item,
+            ) {
               final subtotal = item['product'].price * item['quantity'];
               return Padding(
                 padding: const EdgeInsets.symmetric(vertical: 2.0),

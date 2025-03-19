@@ -1,7 +1,8 @@
 import 'dart:io';
 import 'package:flutter/foundation.dart'; // For debugPrint
 import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:sqflite_common_ffi/sqflite_ffi.dart' as ffi; // Alias for sqflite_common_ffi
+import 'package:sqflite_common_ffi/sqflite_ffi.dart'
+    as ffi; // Alias for sqflite_common_ffi
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/product_model.dart';
@@ -123,15 +124,18 @@ class DatabaseService {
 
   Future<void> insertProduct(String name, double price, int stock) async {
     if (name.isEmpty || price < 0 || stock < 0) {
-      throw Exception('Invalid product data: name must not be empty, price and stock must be non-negative');
+      throw Exception(
+          'Invalid product data: name must not be empty, price and stock must be non-negative');
     }
     final db = await database;
     await db.insert('products', {'name': name, 'price': price, 'stock': stock});
   }
 
-  Future<void> updateProduct(int id, String name, double price, int stock) async {
+  Future<void> updateProduct(
+      int id, String name, double price, int stock) async {
     if (name.isEmpty || price < 0 || stock < 0) {
-      throw Exception('Invalid product data: name must not be empty, price and stock must be non-negative');
+      throw Exception(
+          'Invalid product data: name must not be empty, price and stock must be non-negative');
     }
     final db = await database;
     final rowsAffected = await db.update(
@@ -173,12 +177,11 @@ class DatabaseService {
     }
   }
 
-  Future<Map<String, dynamic>> insertTransaction(
-      double total,
-      String paymentMethod,
-      List<Map<String, dynamic>> cartItems) async {
+  Future<Map<String, dynamic>> insertTransaction(double total,
+      String paymentMethod, List<Map<String, dynamic>> cartItems) async {
     if (total < 0 || paymentMethod.isEmpty || cartItems.isEmpty) {
-      throw Exception('Invalid transaction data: total must be non-negative, payment method and cart required');
+      throw Exception(
+          'Invalid transaction data: total must be non-negative, payment method and cart required');
     }
 
     final db = await database;
@@ -221,7 +224,8 @@ class DatabaseService {
     return result.map((map) => Transaction.fromMap(map)).toList();
   }
 
-  Future<List<Transaction>> getTransactionsByPeriod(DateTime start, DateTime end) async {
+  Future<List<Transaction>> getTransactionsByPeriod(
+      DateTime start, DateTime end) async {
     final db = await database;
     final result = await db.query(
       'transactions',
@@ -231,7 +235,8 @@ class DatabaseService {
     return result.map((map) => Transaction.fromMap(map)).toList();
   }
 
-  Future<List<Map<String, dynamic>>> getTopSellingProducts([DateTime? start, DateTime? end]) async {
+  Future<List<Map<String, dynamic>>> getTopSellingProducts(
+      [DateTime? start, DateTime? end]) async {
     final db = await database;
     String query = '''
       SELECT p.name, SUM(ti.quantity) as quantity, SUM(ti.quantity * ti.price) as total_sales
