@@ -1,0 +1,40 @@
+name: cashify_app
+description: "A Flutter-based desktop cashiering application for Ukay-Ukay stores."
+publish_to: 'none' # Prevents accidental publishing to pub.dev
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0' # Updated for broader compatibility
+
+dependencies:
+  flutter:
+    sdk: flutter
+  sqflite: ^2.3.3          # SQLite database support
+  crypto: ^3.0.5          # For password hashing
+  google_fonts: ^6.2.1    # Dynamic font loading
+  sqflite_common_ffi: ^2.3.3 # FFI support for desktop SQLite
+  path: ^1.9.0            # Path manipulation
+  path_provider: ^2.1.4   # Directory access for database storage
+  provider: ^6.1.2        # State management
+  pdf: ^3.11.0            # PDF generation for receipts
+  printing: ^5.13.2       # Printing and PDF sharing
+  cupertino_icons: ^1.0.8 # Cupertino icons
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0   # Recommended lints for code quality
+
+flutter:
+  uses-material-design: true # Enables Material icons
+
+  # Uncomment and configure assets if you use images or other files
+  # assets:
+  #   - assets/images/
+
+  # Uncomment and configure fonts if you use custom local fonts
+  # fonts:
+  #   - family: CustomFont
+  #     fonts:
+  #       - asset: fonts/CustomFont-Regular.ttf
