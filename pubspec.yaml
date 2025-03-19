@@ -1,39 +1,39 @@
 name: cashify_app
-description: "A Flutter-based desktop cashiering application for Ukay-Ukay stores."
+description: "A Flutter-based cashiering application for Ukay-Ukay stores, supporting desktop and mobile."
 publish_to: 'none' # Prevents accidental publishing to pub.dev
 
 version: 1.0.0+1
 
 environment:
-  sdk: '>=3.3.0 <4.0.0' # Updated for broader compatibility
+  sdk: '>=3.3.0 <4.0.0' # Matches your current setup
 
 dependencies:
   flutter:
     sdk: flutter
-  sqflite: ^2.3.3          # SQLite database support
-  crypto: ^3.0.5          # For password hashing
-  google_fonts: ^6.2.1    # Dynamic font loading
-  sqflite_common_ffi: ^2.3.3 # FFI support for desktop SQLite
-  path: ^1.9.0            # Path manipulation
-  path_provider: ^2.1.4   # Directory access for database storage
+  sqflite: ^2.3.3          # Native SQLite for Android/iOS
+  sqflite_common_ffi: ^2.3.3 # FFI for desktop SQLite (Windows/Mac/Linux)
+  crypto: ^3.0.5          # Password hashing
+  google_fonts: ^6.2.1    # Dynamic fonts
+  path: ^1.9.0            # Path utilities
+  path_provider: ^2.1.4   # Directory access for storage
   provider: ^6.1.2        # State management
-  pdf: ^3.11.0            # PDF generation for receipts
+  pdf: ^3.11.0            # PDF generation
   printing: ^5.13.2       # Printing and PDF sharing
   cupertino_icons: ^1.0.8 # Cupertino icons
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  flutter_lints: ^5.0.0   # Recommended lints for code quality
+  flutter_lints: ^5.0.0   # Code quality lints
 
 flutter:
   uses-material-design: true # Enables Material icons
 
-  # Uncomment and configure assets if you use images or other files
+  # Uncomment if you add assets later
   # assets:
   #   - assets/images/
 
-  # Uncomment and configure fonts if you use custom local fonts
+  # Uncomment if you use custom local fonts
   # fonts:
   #   - family: CustomFont
   #     fonts:

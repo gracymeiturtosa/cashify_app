@@ -1,9 +1,11 @@
+import 'dart:io';
 import 'package:flutter/foundation.dart'; // For debugPrint
 import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart' as ffi; // Alias for sqflite_common_ffi
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/product_model.dart';
-import '../models/transaction_model.dart';
+import '../models/transaction_model.dart'; // Uses your Transaction class
 import '../models/user_model.dart';
 
 class DatabaseService {
@@ -20,64 +22,87 @@ class DatabaseService {
   }
 
   Future<sqflite.Database> _initDatabase() async {
-    final documentsDirectory = await getApplicationDocumentsDirectory();
-    final path = join(documentsDirectory.path, 'ukay_ukay.db');
-    debugPrint('Database path: $path');
+    try {
+      final documentsDirectory = await getApplicationDocumentsDirectory();
+      final path = join(documentsDirectory.path, 'ukay_ukay.db');
+      debugPrint('Database path: $path');
 
-    return await sqflite.openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async {
-        debugPrint('Creating database tables...');
-        await db.execute('''
-          CREATE TABLE users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            username TEXT NOT NULL,
-            password TEXT NOT NULL
-          )
-        ''');
-        await db.execute('''
-          CREATE TABLE products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            name TEXT NOT NULL,
-            price REAL NOT NULL,
-            stock INTEGER NOT NULL
-          )
-        ''');
-        await db.execute('''
-          CREATE TABLE transactions (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            timestamp TEXT NOT NULL,
-            total REAL NOT NULL,
-            payment_method TEXT NOT NULL
-          )
-        ''');
-        await db.execute('''
-          CREATE TABLE transaction_items (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            transaction_id INTEGER NOT NULL,
-            product_id INTEGER NOT NULL,
-            quantity INTEGER NOT NULL,
-            price REAL NOT NULL,
-            FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
-            FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
-          )
-        ''');
-        await db.execute('''
-          CREATE TABLE settings (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cash_enabled INTEGER NOT NULL DEFAULT 1,
-            card_enabled INTEGER NOT NULL DEFAULT 0
-          )
-        ''');
+      if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+        // Desktop: Use sqflite_common_ffi with alias
+        return await ffi.databaseFactoryFfi.openDatabase(
+          path,
+          options: ffi.OpenDatabaseOptions(
+            version: 1,
+            onCreate: _onCreate,
+          ),
+        );
+      } else {
+        // Android/iOS: Use sqflite natively
+        return await sqflite.openDatabase(
+          path,
+          version: 1,
+          onCreate: _onCreate,
+        );
+      }
+    } catch (e) {
+      debugPrint('Database initialization error: $e');
+      rethrow;
+    }
+  }
 
-        await db.insert('users', {'username': 'admin', 'password': 'admin123'});
-        await db.insert('products', {'name': 'Shirt', 'price': 50.0, 'stock': 10});
-        await db.insert('products', {'name': 'Pants', 'price': 100.0, 'stock': 5});
-        await db.insert('settings', {'cash_enabled': 1, 'card_enabled': 0});
-        debugPrint('Database initialized with default data');
-      },
-    );
+  Future<void> _onCreate(sqflite.Database db, int version) async {
+    debugPrint('Creating database tables...');
+    await db.execute('''
+      CREATE TABLE users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT NOT NULL,
+        password TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        price REAL NOT NULL,
+        stock INTEGER NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        timestamp TEXT NOT NULL,
+        total REAL NOT NULL,
+        payment_method TEXT NOT NULL
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE transaction_items (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        transaction_id INTEGER NOT NULL,
+        product_id INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        price REAL NOT NULL,
+        FOREIGN KEY (transaction_id) REFERENCES transactions(id) ON DELETE CASCADE,
+        FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute('''
+      CREATE TABLE settings (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        cash_enabled INTEGER NOT NULL DEFAULT 1,
+        card_enabled INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+
+    await db.insert('users', {'username': 'admin', 'password': 'admin123'});
+    await db.insert('products', {'name': 'Shirt', 'price': 50.0, 'stock': 10});
+    await db.insert('products', {'name': 'Pants', 'price': 100.0, 'stock': 5});
+    await db.insert('settings', {'cash_enabled': 1, 'card_enabled': 0});
+    debugPrint('Database initialized with default data');
+  }
+
+  Future<void> init() async {
+    await database; // Ensure database is initialized
   }
 
   Future<List<User>> login(String username, String password) async {
@@ -151,8 +176,7 @@ class DatabaseService {
   Future<Map<String, dynamic>> insertTransaction(
       double total,
       String paymentMethod,
-      List<Map<String, dynamic>> cartItems,
-      ) async {
+      List<Map<String, dynamic>> cartItems) async {
     if (total < 0 || paymentMethod.isEmpty || cartItems.isEmpty) {
       throw Exception('Invalid transaction data: total must be non-negative, payment method and cart required');
     }

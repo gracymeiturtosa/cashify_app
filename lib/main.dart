@@ -1,6 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite_common_ffi/sqflite_ffi.dart'; // For desktop SQLite
 import 'screens/login_screen.dart';
 import 'providers/auth_provider.dart';
 import 'providers/transaction_provider.dart';
@@ -10,6 +12,18 @@ import 'services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize SQLite based on platform
+  if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
+    // Desktop: Use sqflite_common_ffi
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
+  }
+  // Android/iOS: Use sqflite natively (no FFI needed)
+
+  // Initialize DatabaseService (assuming it needs async setup)
+  await DatabaseService().init();
+
   runApp(
     MultiProvider(
       providers: [
