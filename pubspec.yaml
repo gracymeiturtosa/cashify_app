@@ -29,12 +29,11 @@ dev_dependencies:
 flutter:
   uses-material-design: true # Enables Material icons
 
-  # Uncomment if you add assets later
-  # assets:
-  #   - assets/images/
+  assets:
+    - assets/fonts/RobotoMono-Regular.ttf # Add this for ReceiptWidget
 
-  # Uncomment if you use custom local fonts
-  # fonts:
-  #   - family: CustomFont
-  #     fonts:
-  #       - asset: fonts/CustomFont-Regular.ttf
+  # Optional: Define the font family if you want to use it elsewhere
+  fonts:
+    - family: RobotoMono
+      fonts:
+        - asset: assets/fonts/RobotoMono-Regular.ttf
