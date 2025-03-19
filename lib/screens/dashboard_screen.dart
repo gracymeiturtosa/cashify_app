@@ -16,7 +16,7 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cashify', style: Theme.of(context).textTheme.headlineLarge),
+        title: Text('Cashify App', style: Theme.of(context).textTheme.headlineLarge),
         backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
       ),
