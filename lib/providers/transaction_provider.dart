@@ -137,13 +137,25 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+      // Preserve cart data before clearing
+      final cartCopy = List<Map<String, dynamic>>.from(_cart);
+
       // Use the updated insertTransaction method from DatabaseService
       final transactionDetails = await _dbService.insertTransaction(
         _total,
         _paymentMethod,
-        _cart,
+        cartCopy, // Pass the copy to ensure it’s preserved
       );
 
+      // Construct the full transaction details to return
+      final result = {
+        'transactionId': transactionDetails['transactionId'] ?? -1,
+        'total': _total,
+        'cart': cartCopy, // Use the preserved cart
+        'paymentMethod': _paymentMethod,
+      };
+
+      // Clear cart and reset total only after successful transaction
       _cart.clear();
       _total = 0.0;
       await _loadProducts();
@@ -156,7 +168,7 @@ class TransactionProvider with ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-      return transactionDetails;
+      return result;
     } catch (e) {
       _errorMessage = 'Transaction failed: $e';
       _isLoading = false;
@@ -164,7 +176,7 @@ class TransactionProvider with ChangeNotifier {
       return {
         'transactionId': -1,
         'total': 0.0,
-        'cart': [],
+        'cart': [], // Empty cart on failure
         'paymentMethod': _paymentMethod,
       };
     }

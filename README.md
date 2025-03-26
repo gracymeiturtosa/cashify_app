@@ -16,8 +16,12 @@ For help getting started with Flutter development, view the
 samples, guidance on mobile development, and a full API reference.
 
 
+turn on developer options > allow usb debugging > connect phone to pc/laptop > change phone charging settings from charge only to file transfer > proceed on terminal
 
-flutter run --release -d KFTW49BUW4CQT4SO
+flutter devices > find your device id > flutter run --release -d [then add it here and run]
+
+flutter run --release -d windows
+flutter run --release -d chrome
 flutter pub get
 flutter pub outdated
 clear
@@ -25,5 +29,4 @@ y
 n
 flutter build apk --release
 flutter logs
-flutter devices
 flutter doctor
