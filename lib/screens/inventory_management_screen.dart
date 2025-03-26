@@ -8,7 +8,8 @@ class InventoryManagementScreen extends StatefulWidget {
   const InventoryManagementScreen({super.key});
 
   @override
-  _InventoryManagementScreenState createState() => _InventoryManagementScreenState();
+  _InventoryManagementScreenState createState() =>
+      _InventoryManagementScreenState();
 }
 
 class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
@@ -18,14 +19,17 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
 
   void _showEditDialog(BuildContext context, Product product) {
     final nameController = TextEditingController(text: product.name);
-    final priceController = TextEditingController(text: product.price.toString());
-    final stockController = TextEditingController(text: product.stock.toString());
+    final priceController =
+        TextEditingController(text: product.price.toString());
+    final stockController =
+        TextEditingController(text: product.stock.toString());
 
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Edit Product', style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('Edit Product',
+            style: Theme.of(context).textTheme.headlineMedium),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -65,11 +69,13 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text('Cancel', style: Theme.of(context).textTheme.bodyMedium),
+            child:
+                Text('Cancel', style: Theme.of(context).textTheme.bodyMedium),
           ),
           TextButton(
             onPressed: () async {
-              final inventoryProvider = Provider.of<InventoryProvider>(context, listen: false);
+              final inventoryProvider =
+                  Provider.of<InventoryProvider>(context, listen: false);
               try {
                 final success = await inventoryProvider.updateProduct(
                   product.id,
@@ -78,16 +84,20 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
                   int.parse(stockController.text),
                 );
                 if (success && context.mounted) {
-                  await Provider.of<TransactionProvider>(context, listen: false).refreshProducts();
+                  await Provider.of<TransactionProvider>(context, listen: false)
+                      .refreshProducts();
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Product updated successfully')),
+                    const SnackBar(
+                        content: Text('Product updated successfully')),
                   );
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(inventoryProvider.errorMessage ?? 'Invalid input')),
+                    SnackBar(
+                        content: Text(
+                            inventoryProvider.errorMessage ?? 'Invalid input')),
                   );
                 }
               }
@@ -103,13 +113,19 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
     final sortedProducts = List<Product>.from(products);
     switch (_sortBy) {
       case 'Name':
-        sortedProducts.sort((a, b) => _sortAscending ? a.name.compareTo(b.name) : b.name.compareTo(a.name));
+        sortedProducts.sort((a, b) => _sortAscending
+            ? a.name.compareTo(b.name)
+            : b.name.compareTo(a.name));
         break;
       case 'Price':
-        sortedProducts.sort((a, b) => _sortAscending ? a.price.compareTo(b.price) : b.price.compareTo(a.price));
+        sortedProducts.sort((a, b) => _sortAscending
+            ? a.price.compareTo(b.price)
+            : b.price.compareTo(a.price));
         break;
       case 'Stock':
-        sortedProducts.sort((a, b) => _sortAscending ? a.stock.compareTo(b.stock) : b.stock.compareTo(a.stock));
+        sortedProducts.sort((a, b) => _sortAscending
+            ? a.stock.compareTo(b.stock)
+            : b.stock.compareTo(a.stock));
         break;
     }
     return sortedProducts;
@@ -121,7 +137,10 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
       appBar: AppBar(
         title: Text(
           'Stock Management',
-          style: Theme.of(context).textTheme.headlineLarge!.copyWith(color: Colors.black), // Changed to black
+          style: Theme.of(context)
+              .textTheme
+              .headlineLarge!
+              .copyWith(color: Colors.black), // Changed to black
         ),
         backgroundColor: Theme.of(context).primaryColor,
       ),
@@ -140,7 +159,8 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
               onChanged: (value) => setState(() => _searchQuery = value),
             ),
             const SizedBox(height: 16.0),
-            _buildAddProductForm(context, Provider.of<InventoryProvider>(context, listen: false)),
+            _buildAddProductForm(context,
+                Provider.of<InventoryProvider>(context, listen: false)),
             const SizedBox(height: 16.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -148,16 +168,23 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
                 DropdownButton<String>(
                   value: _sortBy,
                   items: const [
-                    DropdownMenuItem(value: 'Name', child: Text('Sort by Name')),
-                    DropdownMenuItem(value: 'Price', child: Text('Sort by Price')),
-                    DropdownMenuItem(value: 'Stock', child: Text('Sort by Stock')),
+                    DropdownMenuItem(
+                        value: 'Name', child: Text('Sort by Name')),
+                    DropdownMenuItem(
+                        value: 'Price', child: Text('Sort by Price')),
+                    DropdownMenuItem(
+                        value: 'Stock', child: Text('Sort by Stock')),
                   ],
-                  onChanged: (value) => setState(() => _sortBy = value ?? 'Name'),
+                  onChanged: (value) =>
+                      setState(() => _sortBy = value ?? 'Name'),
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 IconButton(
-                  icon: Icon(_sortAscending ? Icons.arrow_upward : Icons.arrow_downward),
-                  onPressed: () => setState(() => _sortAscending = !_sortAscending),
+                  icon: Icon(_sortAscending
+                      ? Icons.arrow_upward
+                      : Icons.arrow_downward),
+                  onPressed: () =>
+                      setState(() => _sortAscending = !_sortAscending),
                 ),
               ],
             ),
@@ -165,12 +192,18 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
             Expanded(
               child: Consumer<InventoryProvider>(
                 builder: (context, provider, child) {
-                  if (provider.isLoading) return const Center(child: CircularProgressIndicator());
+                  if (provider.isLoading)
+                    return const Center(child: CircularProgressIndicator());
                   if (provider.errorMessage != null) {
-                    return Center(child: Text(provider.errorMessage!, style: Theme.of(context).textTheme.bodyMedium));
+                    return Center(
+                        child: Text(provider.errorMessage!,
+                            style: Theme.of(context).textTheme.bodyMedium));
                   }
-                  final filteredProducts =
-                      provider.products.where((p) => p.name.toLowerCase().contains(_searchQuery.toLowerCase())).toList();
+                  final filteredProducts = provider.products
+                      .where((p) => p.name
+                          .toLowerCase()
+                          .contains(_searchQuery.toLowerCase()))
+                      .toList();
                   final sortedProducts = _sortProducts(filteredProducts);
 
                   return ListView.builder(
@@ -180,7 +213,8 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
                       return Card(
                         color: Theme.of(context).colorScheme.surface,
                         child: ListTile(
-                          title: Text(product.name, style: Theme.of(context).textTheme.headlineSmall),
+                          title: Text(product.name,
+                              style: Theme.of(context).textTheme.headlineSmall),
                           subtitle: Text(
                             'Price: ${product.price.toStringAsFixed(2)} | Stock: ${product.stock}',
                             style: Theme.of(context).textTheme.bodyMedium,
@@ -190,11 +224,13 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
                             children: [
                               IconButton(
                                 icon: const Icon(Icons.edit),
-                                onPressed: () => _showEditDialog(context, product),
+                                onPressed: () =>
+                                    _showEditDialog(context, product),
                               ),
                               IconButton(
                                 icon: const Icon(Icons.delete),
-                                onPressed: () => _confirmDelete(context, product),
+                                onPressed: () =>
+                                    _confirmDelete(context, product),
                               ),
                             ],
                           ),
@@ -211,7 +247,8 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
     );
   }
 
-  Widget _buildAddProductForm(BuildContext context, InventoryProvider provider) {
+  Widget _buildAddProductForm(
+      BuildContext context, InventoryProvider provider) {
     final nameController = TextEditingController();
     final priceController = TextEditingController();
     final stockController = TextEditingController();
@@ -260,8 +297,11 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
           onPressed: provider.isLoading
               ? null
               : () async {
-                  if (nameController.text.isEmpty || priceController.text.isEmpty || stockController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('All fields are required')));
+                  if (nameController.text.isEmpty ||
+                      priceController.text.isEmpty ||
+                      stockController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('All fields are required')));
                     return;
                   }
                   try {
@@ -271,28 +311,38 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
                       int.parse(stockController.text),
                     );
                     if (success && context.mounted) {
-                      await Provider.of<TransactionProvider>(context, listen: false).refreshProducts();
+                      await Provider.of<TransactionProvider>(context,
+                              listen: false)
+                          .refreshProducts();
                       nameController.clear();
                       priceController.clear();
                       stockController.clear();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Product added successfully')),
+                        const SnackBar(
+                            content: Text('Product added successfully')),
                       );
                     } else if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(provider.errorMessage ?? 'Unknown error')),
+                        SnackBar(
+                            content:
+                                Text(provider.errorMessage ?? 'Unknown error')),
                       );
                     }
                   } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(provider.errorMessage ?? 'Invalid input')),
+                        SnackBar(
+                            content:
+                                Text(provider.errorMessage ?? 'Invalid input')),
                       );
                     }
                   }
                 },
           child: provider.isLoading
-              ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Color(0xFF163300)))
+              ? const SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(color: Color(0xFF163300)))
               : Text('Add', style: Theme.of(context).textTheme.labelLarge),
         ),
       ],
@@ -304,7 +354,8 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Delete Product', style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('Delete Product',
+            style: Theme.of(context).textTheme.headlineMedium),
         content: Text('Are you sure you want to delete ${product.name}?',
             style: Theme.of(context).textTheme.bodyLarge),
         actions: [
@@ -321,14 +372,19 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
     );
 
     if (confirm == true && context.mounted) {
-      final inventoryProvider = Provider.of<InventoryProvider>(context, listen: false);
+      final inventoryProvider =
+          Provider.of<InventoryProvider>(context, listen: false);
       final success = await inventoryProvider.deleteProduct(product.id);
       if (success && context.mounted) {
-        await Provider.of<TransactionProvider>(context, listen: false).refreshProducts();
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Product deleted successfully')));
+        await Provider.of<TransactionProvider>(context, listen: false)
+            .refreshProducts();
+        ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Product deleted successfully')));
       } else if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(inventoryProvider.errorMessage ?? 'Failed to delete product')),
+          SnackBar(
+              content: Text(inventoryProvider.errorMessage ??
+                  'Failed to delete product')),
         );
       }
     }

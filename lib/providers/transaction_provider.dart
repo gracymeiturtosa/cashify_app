@@ -120,7 +120,8 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>> completeTransaction(BuildContext context, {required double cashTendered}) async {
+  Future<Map<String, dynamic>> completeTransaction(BuildContext context,
+      {required double cashTendered}) async {
     if (_cart.isEmpty) {
       _errorMessage = 'Cart is empty';
       notifyListeners();
@@ -151,29 +152,8 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-<<<<<<< HEAD
-      // Preserve cart data before clearing
       final cartCopy = List<Map<String, dynamic>>.from(_cart);
 
-      // Use the updated insertTransaction method from DatabaseService
-      final transactionDetails = await _dbService.insertTransaction(
-        _total,
-        _paymentMethod,
-        cartCopy, // Pass the copy to ensure it’s preserved
-      );
-
-      // Construct the full transaction details to return
-      final result = {
-        'transactionId': transactionDetails['transactionId'] ?? -1,
-        'total': _total,
-        'cart': cartCopy, // Use the preserved cart
-        'paymentMethod': _paymentMethod,
-      };
-
-      // Clear cart and reset total only after successful transaction
-=======
-      final cartCopy = List<Map<String, dynamic>>.from(_cart);
-      
       final transactionDetails = await _dbService.insertTransaction(
         _total,
         _paymentMethod,
@@ -186,10 +166,10 @@ class TransactionProvider with ChangeNotifier {
         'total': _total,
         'cart': cartCopy,
         'paymentMethod': _paymentMethod,
-        'change': transactionDetails['change'] as double, // Use change from DatabaseService
+        'change': transactionDetails['change']
+            as double, // Use change from DatabaseService
       };
 
->>>>>>> 9d7be7c8502db62a78fdb8bb41e7e088028d963b
       _cart.clear();
       _total = 0.0;
       await _loadProducts();
@@ -210,7 +190,7 @@ class TransactionProvider with ChangeNotifier {
       return {
         'transactionId': -1,
         'total': 0.0,
-        'cart': [], // Empty cart on failure
+        'cart': [],
         'paymentMethod': _paymentMethod,
         'change': 0.0,
       };

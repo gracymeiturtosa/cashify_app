@@ -17,6 +17,25 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
   DateTime _fromDate = DateTime.now().subtract(const Duration(days: 7));
   DateTime _toDate = DateTime.now();
 
+  // Date formatter for month names
+  String _formatDate(DateTime date) {
+    const months = [
+      'January',
+      'February',
+      'March',
+      'April',
+      'May',
+      'June',
+      'July',
+      'August',
+      'September',
+      'October',
+      'November',
+      'December'
+    ];
+    return '${months[date.month - 1]} ${date.day}, ${date.year}';
+  }
+
   Future<void> _selectDate(BuildContext context, bool isFrom) async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -32,7 +51,8 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           _toDate = picked;
         }
       });
-      final reportProvider = Provider.of<ReportProvider>(context, listen: false);
+      final reportProvider =
+          Provider.of<ReportProvider>(context, listen: false);
       reportProvider.setDateRange(_fromDate, _toDate);
     }
   }
@@ -42,7 +62,8 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     reportProvider.setDateRange(_fromDate, _toDate);
   }
 
-  Future<void> _generateTransactionPdf(BuildContext context, Map<String, dynamic> transaction) async {
+  Future<void> _generateTransactionPdf(
+      BuildContext context, Map<String, dynamic> transaction) async {
     debugPrint('Generating PDF for transaction: $transaction');
     final doc = pw.Document();
     final font = await PdfGoogleFonts.robotoRegular();
@@ -78,7 +99,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
               style: pw.TextStyle(fontSize: 14, font: font),
             ),
             pw.Text(
-              'Date: ${transaction['timestamp']}',
+              'Date: ${_formatDate(DateTime.parse(transaction['timestamp']))}',
               style: pw.TextStyle(fontSize: 14, font: font),
             ),
             pw.Text(
@@ -88,17 +109,22 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             pw.SizedBox(height: 24),
             pw.Text(
               'Items:',
-              style: pw.TextStyle(fontSize: 16, fontWeight: pw.FontWeight.bold, font: font),
+              style: pw.TextStyle(
+                  fontSize: 16, fontWeight: pw.FontWeight.bold, font: font),
             ),
             pw.SizedBox(height: 8),
-            transactionDetails['cart'] == null || (transactionDetails['cart'] as List).isEmpty
+            transactionDetails['cart'] == null ||
+                    (transactionDetails['cart'] as List).isEmpty
                 ? pw.Text(
                     'No items recorded',
-                    style: pw.TextStyle(fontSize: 12, font: font, color: PdfColors.grey),
+                    style: pw.TextStyle(
+                        fontSize: 12, font: font, color: PdfColors.grey),
                   )
                 : pw.Table.fromTextArray(
                     headers: ['Product', 'Qty', 'Price', 'Subtotal'],
-                    data: (transactionDetails['cart'] as List<Map<String, dynamic>>).map((item) {
+                    data: (transactionDetails['cart']
+                            as List<Map<String, dynamic>>)
+                        .map((item) {
                       final product = item['product'];
                       final quantity = item['quantity'] ?? 0;
                       final subtotal = (product['price'] ?? 0) * quantity;
@@ -117,7 +143,8 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                     ),
                     cellStyle: pw.TextStyle(fontSize: 12, font: font),
                     cellAlignment: pw.Alignment.centerRight,
-                    headerDecoration: const pw.BoxDecoration(color: PdfColors.grey200),
+                    headerDecoration:
+                        const pw.BoxDecoration(color: PdfColors.grey200),
                     cellPadding: const pw.EdgeInsets.all(4),
                   ),
             pw.SizedBox(height: 24),
@@ -137,7 +164,8 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                   pw.SizedBox(height: 8),
                   pw.Text(
                     'Change: ₱${transactionDetails['change'].toStringAsFixed(2)}',
-                    style: pw.TextStyle(fontSize: 16, font: font, color: PdfColors.green700),
+                    style: pw.TextStyle(
+                        fontSize: 16, font: font, color: PdfColors.green700),
                   ),
                 ],
               ],
@@ -147,7 +175,8 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             pw.SizedBox(height: 8),
             pw.Text(
               'Thank you for shopping at Ukay Ukay!',
-              style: pw.TextStyle(fontSize: 12, font: font, color: PdfColors.grey700),
+              style: pw.TextStyle(
+                  fontSize: 12, font: font, color: PdfColors.grey700),
               textAlign: pw.TextAlign.center,
             ),
           ],
@@ -169,30 +198,183 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     }
   }
 
-  void _showTransactionDetails(BuildContext context, Map<String, dynamic> transaction) {
+  Future<void> _generateTotalSalesPdf(BuildContext context) async {
+    final reportProvider = Provider.of<ReportProvider>(context, listen: false);
+    final doc = pw.Document();
+    final font = await PdfGoogleFonts.robotoRegular();
+
+    doc.addPage(
+      pw.Page(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) => pw.Column(
+          crossAxisAlignment: pw.CrossAxisAlignment.start,
+          children: [
+            pw.Text(
+              'Ukay Ukay Sales Report',
+              style: pw.TextStyle(
+                fontSize: 28,
+                fontWeight: pw.FontWeight.bold,
+                font: font,
+                color: PdfColors.green900,
+              ),
+            ),
+            pw.SizedBox(height: 16),
+            pw.Divider(),
+            pw.SizedBox(height: 16),
+            pw.Text(
+              'Date Range: ${_formatDate(_fromDate)} to ${_formatDate(_toDate)}',
+              style: pw.TextStyle(fontSize: 14, font: font),
+            ),
+            pw.Text(
+              'Report Type: ${reportProvider.selectedReport}',
+              style: pw.TextStyle(fontSize: 14, font: font),
+            ),
+            pw.SizedBox(height: 24),
+            pw.Text(
+              reportProvider.selectedReport == 'Transactions'
+                  ? 'Transactions'
+                  : 'Top Selling Products',
+              style: pw.TextStyle(
+                  fontSize: 16, fontWeight: pw.FontWeight.bold, font: font),
+            ),
+            pw.SizedBox(height: 8),
+            reportProvider.selectedReport == 'Transactions'
+                ? reportProvider.transactions.isEmpty
+                    ? pw.Text(
+                        'No transactions recorded',
+                        style: pw.TextStyle(
+                            fontSize: 12, font: font, color: PdfColors.grey),
+                      )
+                    : pw.Table.fromTextArray(
+                        headers: ['ID', 'Date', 'Total'],
+                        data: reportProvider.transactions.map((t) {
+                          return [
+                            t.id.toString(),
+                            _formatDate(DateTime.parse(t.timestamp)),
+                            '₱${t.total.toStringAsFixed(2)}',
+                          ];
+                        }).toList(),
+                        headerStyle: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 14,
+                          font: font,
+                          color: PdfColors.black,
+                        ),
+                        cellStyle: pw.TextStyle(fontSize: 12, font: font),
+                        cellAlignment: pw.Alignment.centerRight,
+                        headerDecoration:
+                            const pw.BoxDecoration(color: PdfColors.grey200),
+                        cellPadding: const pw.EdgeInsets.all(4),
+                      )
+                : reportProvider.topSellingProducts.isEmpty
+                    ? pw.Text(
+                        'No top-selling products recorded',
+                        style: pw.TextStyle(
+                            fontSize: 12, font: font, color: PdfColors.grey),
+                      )
+                    : pw.Table.fromTextArray(
+                        headers: ['Product', 'Qty Sold', 'Total Sales'],
+                        data: reportProvider.topSellingProducts.map((p) {
+                          return [
+                            p['name'] ?? 'Unknown Product',
+                            p['quantity'].toString(),
+                            '₱${p['total_sales'].toStringAsFixed(2)}',
+                          ];
+                        }).toList(),
+                        headerStyle: pw.TextStyle(
+                          fontWeight: pw.FontWeight.bold,
+                          fontSize: 14,
+                          font: font,
+                          color: PdfColors.black,
+                        ),
+                        cellStyle: pw.TextStyle(fontSize: 12, font: font),
+                        cellAlignment: pw.Alignment.centerRight,
+                        headerDecoration:
+                            const pw.BoxDecoration(color: PdfColors.grey200),
+                        cellPadding: const pw.EdgeInsets.all(4),
+                      ),
+            pw.SizedBox(height: 24),
+            pw.Column(
+              crossAxisAlignment: pw.CrossAxisAlignment.end,
+              children: [
+                pw.Text(
+                  'Total Sales: ₱${reportProvider.totalSales.toStringAsFixed(2)}',
+                  style: pw.TextStyle(
+                    fontSize: 18,
+                    fontWeight: pw.FontWeight.bold,
+                    font: font,
+                    color: PdfColors.green900,
+                  ),
+                ),
+              ],
+            ),
+            pw.SizedBox(height: 16),
+            pw.Divider(),
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Generated on: ${_formatDate(DateTime.now())}',
+              style: pw.TextStyle(
+                  fontSize: 12, font: font, color: PdfColors.grey700),
+              textAlign: pw.TextAlign.center,
+            ),
+          ],
+        ),
+      ),
+    );
+
+    try {
+      await Printing.sharePdf(
+        bytes: await doc.save(),
+        filename:
+            'sales_report_${_fromDate.toString().substring(0, 10)}_to_${_toDate.toString().substring(0, 10)}.pdf',
+      );
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to generate PDF: $e')),
+        );
+      }
+    }
+  }
+
+  void _showTransactionDetails(
+      BuildContext context, Map<String, dynamic> transaction) {
     debugPrint('Transaction Details: $transaction');
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        title: Text('Transaction #${transaction['id']}', style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('Transaction #${transaction['id']}',
+            style: Theme.of(context).textTheme.headlineMedium),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text('Date: ${transaction['timestamp']}', style: Theme.of(context).textTheme.bodyMedium),
-              Text('Payment Method: ${transaction['payment_method'] ?? 'Unknown'}',
-                  style: Theme.of(context).textTheme.bodyMedium),
+              Text(
+                'Date: ${_formatDate(DateTime.parse(transaction['timestamp']))}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              Text(
+                'Payment Method: ${transaction['payment_method'] ?? 'Unknown'}',
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
               const SizedBox(height: 12),
               const Divider(),
               const SizedBox(height: 12),
               Text('Items:', style: Theme.of(context).textTheme.bodyLarge),
               const SizedBox(height: 8),
-              transaction['cart'] == null || (transaction['cart'] as List).isEmpty
-                  ? Text('No items recorded', style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: Colors.grey))
+              transaction['cart'] == null ||
+                      (transaction['cart'] as List).isEmpty
+                  ? Text('No items recorded',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyMedium!
+                          .copyWith(color: Colors.grey))
                   : Column(
-                      children: (transaction['cart'] as List<Map<String, dynamic>>).map((item) {
+                      children:
+                          (transaction['cart'] as List<Map<String, dynamic>>)
+                              .map((item) {
                         final product = item['product'];
                         final quantity = item['quantity'] ?? 0;
                         final subtotal = (product['price'] ?? 0) * quantity;
@@ -222,9 +404,18 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Total:', style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
-                  Text('₱${transaction['total'].toStringAsFixed(2)}',
-                      style: Theme.of(context).textTheme.bodyLarge!.copyWith(fontWeight: FontWeight.bold)),
+                  Text('Total:',
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodyLarge!
+                          .copyWith(fontWeight: FontWeight.bold)),
+                  Text(
+                    '₱${transaction['total'].toStringAsFixed(2)}',
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge!
+                        .copyWith(fontWeight: FontWeight.bold),
+                  ),
                 ],
               ),
               if (transaction['payment_method'] == 'Cash') ...[
@@ -232,9 +423,12 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Change:', style: Theme.of(context).textTheme.bodyMedium),
-                    Text('₱${(transaction['change'] as double).toStringAsFixed(2)}',
+                    Text('Change:',
                         style: Theme.of(context).textTheme.bodyMedium),
+                    Text(
+                      '₱${(transaction['change'] as double).toStringAsFixed(2)}',
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ],
                 ),
               ],
@@ -257,7 +451,10 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
       appBar: AppBar(
         title: Text(
           'Sales Reports',
-          style: Theme.of(context).textTheme.headlineLarge!.copyWith(color: Colors.black),
+          style: Theme.of(context)
+              .textTheme
+              .headlineLarge!
+              .copyWith(color: Colors.black),
         ),
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
@@ -272,7 +469,8 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Consumer<ReportProvider>(
           builder: (context, reportProvider, child) {
-            debugPrint('Transactions in ReportProvider: ${reportProvider.transactions}');
+            debugPrint(
+                'Transactions in ReportProvider: ${reportProvider.transactions}');
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -282,8 +480,8 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                       child: ElevatedButton(
                         onPressed: () => _selectDate(context, true),
                         child: Text(
-                          'From: ${_fromDate.toString().substring(0, 10)}',
-                          style: Theme.of(context).textTheme.labelLarge, // Fixed parameter name
+                          'From: ${_formatDate(_fromDate)}',
+                          style: Theme.of(context).textTheme.labelLarge,
                         ),
                       ),
                     ),
@@ -292,7 +490,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                       child: ElevatedButton(
                         onPressed: () => _selectDate(context, false),
                         child: Text(
-                          'To: ${_toDate.toString().substring(0, 10)}',
+                          'To: ${_formatDate(_toDate)}',
                           style: Theme.of(context).textTheme.labelLarge,
                         ),
                       ),
@@ -303,8 +501,11 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                 DropdownButton<String>(
                   value: reportProvider.selectedReport,
                   items: const [
-                    DropdownMenuItem(value: 'Transactions', child: Text('Transactions')),
-                    DropdownMenuItem(value: 'Top Selling', child: Text('Top Selling Products')),
+                    DropdownMenuItem(
+                        value: 'Transactions', child: Text('Transactions')),
+                    DropdownMenuItem(
+                        value: 'Top Selling',
+                        child: Text('Top Selling Products')),
                   ],
                   onChanged: (value) {
                     if (value != null) {
@@ -325,47 +526,68 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                               ),
                             )
                           : ListView.builder(
-                              itemCount: reportProvider.selectedReport == 'Top Selling'
-                                  ? reportProvider.topSellingProducts.length
-                                  : reportProvider.transactions.length,
+                              itemCount:
+                                  reportProvider.selectedReport == 'Top Selling'
+                                      ? reportProvider.topSellingProducts.length
+                                      : reportProvider.transactions.length,
                               itemBuilder: (context, index) {
-                                if (reportProvider.selectedReport == 'Top Selling') {
-                                  final product = reportProvider.topSellingProducts[index];
+                                if (reportProvider.selectedReport ==
+                                    'Top Selling') {
+                                  final product =
+                                      reportProvider.topSellingProducts[index];
                                   return Card(
-                                    color: Theme.of(context).colorScheme.surface,
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
                                     child: ListTile(
                                       title: Text(product['name'],
-                                          style: Theme.of(context).textTheme.headlineSmall),
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall),
                                       subtitle: Text(
                                         'Qty Sold: ${product['quantity']} | Total: ₱${product['total_sales'].toStringAsFixed(2)}',
-                                        style: Theme.of(context).textTheme.bodyMedium,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
                                       ),
                                     ),
                                   );
                                 } else {
-                                  final transaction = reportProvider.transactions[index];
+                                  final transaction =
+                                      reportProvider.transactions[index];
                                   return Card(
-                                    color: Theme.of(context).colorScheme.surface,
+                                    color:
+                                        Theme.of(context).colorScheme.surface,
                                     child: ListTile(
-                                      title: Text('Transaction #${transaction.id}',
-                                          style: Theme.of(context).textTheme.headlineSmall),
+                                      title: Text(
+                                          'Transaction #${transaction.id}',
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .headlineSmall),
                                       subtitle: Text(
-                                        'Total: ₱${transaction.total.toStringAsFixed(2)} | ${transaction.timestamp}',
-                                        style: Theme.of(context).textTheme.bodyMedium,
+                                        'Total: ₱${transaction.total.toStringAsFixed(2)} | ${_formatDate(DateTime.parse(transaction.timestamp))}',
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyMedium,
                                       ),
                                       trailing: Row(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           IconButton(
                                             icon: const Icon(Icons.info),
-                                            color: Theme.of(context).primaryColor,
-                                            onPressed: () => _showTransactionDetails(context, transaction.toMap()),
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            onPressed: () =>
+                                                _showTransactionDetails(context,
+                                                    transaction.toMap()),
                                             tooltip: 'View Details',
                                           ),
                                           IconButton(
                                             icon: const Icon(Icons.print),
-                                            color: Theme.of(context).primaryColor,
-                                            onPressed: () => _generateTransactionPdf(context, transaction.toMap()),
+                                            color:
+                                                Theme.of(context).primaryColor,
+                                            onPressed: () =>
+                                                _generateTransactionPdf(context,
+                                                    transaction.toMap()),
                                             tooltip: 'Print Receipt',
                                           ),
                                         ],
@@ -377,13 +599,25 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                             ),
                 ),
                 const SizedBox(height: 16.0),
-                Text(
-                  'Total Sales: ₱${reportProvider.totalSales.toStringAsFixed(2)}',
-                  style: Theme.of(context)
-                      .textTheme
-                      .headlineMedium!
-                      .copyWith(fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      'Total Sales: ₱${reportProvider.totalSales.toStringAsFixed(2)}',
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium!
+                          .copyWith(fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      icon: const Icon(Icons.print),
+                      color: Theme.of(context).primaryColor,
+                      onPressed: () => _generateTotalSalesPdf(context),
+                      tooltip: 'Print Total Sales Report',
+                    ),
+                  ],
                 ),
               ],
             );

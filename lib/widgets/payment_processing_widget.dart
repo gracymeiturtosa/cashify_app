@@ -8,7 +8,8 @@ class PaymentProcessingWidget extends StatefulWidget {
   const PaymentProcessingWidget({super.key, required this.onComplete});
 
   @override
-  _PaymentProcessingWidgetState createState() => _PaymentProcessingWidgetState();
+  _PaymentProcessingWidgetState createState() =>
+      _PaymentProcessingWidgetState();
 }
 
 class _PaymentProcessingWidgetState extends State<PaymentProcessingWidget> {
@@ -22,8 +23,8 @@ class _PaymentProcessingWidgetState extends State<PaymentProcessingWidget> {
 
         String? initialValue = availableMethods.isNotEmpty
             ? (availableMethods.contains(transactionProvider.paymentMethod)
-            ? transactionProvider.paymentMethod
-            : availableMethods.first)
+                ? transactionProvider.paymentMethod
+                : availableMethods.first)
             : null;
 
         return Padding(
@@ -33,17 +34,18 @@ class _PaymentProcessingWidgetState extends State<PaymentProcessingWidget> {
               if (availableMethods.isEmpty)
                 Text(
                   'No payment methods enabled',
-                  style: Theme.of(context)
-                      .textTheme
-                      .bodyMedium!
-                      .copyWith(color: const Color(0xFFA8200D)), // Sentiment Negative
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(
+                      color: const Color(0xFFA8200D)), // Sentiment Negative
                 )
               else
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12.0, vertical: 4.0),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Theme.of(context).colorScheme.secondary, // Forest Green
+                      color: Theme.of(context)
+                          .colorScheme
+                          .secondary, // Forest Green
                       width: 2.0,
                     ),
                     borderRadius: BorderRadius.circular(8.0),
@@ -53,7 +55,8 @@ class _PaymentProcessingWidgetState extends State<PaymentProcessingWidget> {
                     items: availableMethods.map((method) {
                       return DropdownMenuItem<String>(
                         value: method,
-                        child: Text(method, style: Theme.of(context).textTheme.bodyMedium),
+                        child: Text(method,
+                            style: Theme.of(context).textTheme.bodyMedium),
                       );
                     }).toList(),
                     onChanged: (value) {
@@ -63,28 +66,31 @@ class _PaymentProcessingWidgetState extends State<PaymentProcessingWidget> {
                     },
                     underline: const SizedBox.shrink(),
                     isExpanded: true,
-                    dropdownColor: Theme.of(context).colorScheme.surface, // Lighter Base Dark
+                    dropdownColor: Theme.of(context)
+                        .colorScheme
+                        .surface, // Lighter Base Dark
                   ),
                 ),
               const SizedBox(height: 8.0),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: availableMethods.isEmpty || transactionProvider.isLoading
-                      ? null
-                      : widget.onComplete,
+                  onPressed:
+                      availableMethods.isEmpty || transactionProvider.isLoading
+                          ? null
+                          : widget.onComplete,
                   child: transactionProvider.isLoading
                       ? const SizedBox(
-                    width: 20,
-                    height: 20,
-                    child: CircularProgressIndicator(
-                      color: Color(0xFF163300), // Forest Green
-                    ),
-                  )
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            color: Color(0xFF163300), // Forest Green
+                          ),
+                        )
                       : Text(
-                    'Complete Transaction',
-                    style: Theme.of(context).textTheme.labelLarge,
-                  ),
+                          'Complete Transaction',
+                          style: Theme.of(context).textTheme.labelLarge,
+                        ),
                 ),
               ),
             ],

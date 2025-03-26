@@ -18,7 +18,8 @@ class Transaction {
   factory Transaction.fromMap(Map<String, dynamic> map) {
     return Transaction(
       id: map['id'] as int? ?? 0,
-      timestamp: map['timestamp'] as String? ?? DateTime.now().toIso8601String(),
+      timestamp:
+          map['timestamp'] as String? ?? DateTime.now().toIso8601String(),
       total: (map['total'] as num?)?.toDouble() ?? 0.0,
       paymentMethod: map['payment_method'] as String? ?? 'Unknown',
       change: (map['change'] as num?)?.toDouble() ?? 0.0, // Parse change

@@ -18,7 +18,7 @@ dependencies:
   path_provider: ^2.1.4   # Directory access for storage
   provider: ^6.1.2        # State management
   pdf: ^3.11.0            # PDF generation
-  printing: ^5.13.3       # Printing and PDF sharing
+  printing: ^5.13.2       # Printing and PDF sharing
   cupertino_icons: ^1.0.8 # Cupertino icons
 
 dev_dependencies:

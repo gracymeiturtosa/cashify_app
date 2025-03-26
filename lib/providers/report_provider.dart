@@ -20,7 +20,8 @@ class ReportProvider with ChangeNotifier {
 
   double get totalSales {
     if (_selectedReport == 'Top Selling') {
-      return _topSellingProducts.fold(0.0, (sum, p) => sum + (p['total_sales'] as double));
+      return _topSellingProducts.fold(
+          0.0, (sum, p) => sum + (p['total_sales'] as double));
     } else {
       return _transactions.fold(0.0, (sum, t) => sum + t.total);
     }
@@ -36,8 +37,8 @@ class ReportProvider with ChangeNotifier {
   }
 
   void setDateRange(DateTime from, DateTime to) {
-    _fromDate = from;
-    _toDate = to;
+    _fromDate = DateTime(from.year, from.month, from.day); // Start of day
+    _toDate = DateTime(to.year, to.month, to.day, 23, 59, 59); // End of day
     _loadReport();
   }
 
@@ -48,10 +49,12 @@ class ReportProvider with ChangeNotifier {
 
     try {
       if (_selectedReport == 'Top Selling') {
-        _topSellingProducts = await _dbService.getTopSellingProducts(_fromDate, _toDate);
+        _topSellingProducts =
+            await _dbService.getTopSellingProducts(_fromDate, _toDate);
         _transactions = [];
       } else {
-        _transactions = await _dbService.getTransactionsByPeriod(_fromDate, _toDate);
+        _transactions =
+            await _dbService.getTransactionsByPeriod(_fromDate, _toDate);
         _topSellingProducts = [];
       }
       _isLoading = false;

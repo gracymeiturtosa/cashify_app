@@ -102,10 +102,12 @@ class DatabaseService {
     debugPrint('Database initialized with default data');
   }
 
-  Future<void> _onUpgrade(sqflite.Database db, int oldVersion, int newVersion) async {
+  Future<void> _onUpgrade(
+      sqflite.Database db, int oldVersion, int newVersion) async {
     debugPrint('Upgrading database from version $oldVersion to $newVersion');
     if (oldVersion < 2) {
-      await db.execute('ALTER TABLE transactions ADD COLUMN change REAL NOT NULL DEFAULT 0.0');
+      await db.execute(
+          'ALTER TABLE transactions ADD COLUMN change REAL NOT NULL DEFAULT 0.0');
       debugPrint('Added change column to transactions table');
     }
   }
@@ -138,7 +140,8 @@ class DatabaseService {
     await db.insert('products', {'name': name, 'price': price, 'stock': stock});
   }
 
-  Future<void> updateProduct(int id, String name, double price, int stock) async {
+  Future<void> updateProduct(
+      int id, String name, double price, int stock) async {
     if (name.isEmpty || price < 0 || stock < 0) {
       throw Exception('Invalid product data');
     }
@@ -186,14 +189,17 @@ class DatabaseService {
       double total,
       String paymentMethod,
       List<Map<String, dynamic>> cartItems,
-      double cashTendered) async { // Added cashTendered parameter
+      double cashTendered) async {
+    // Added cashTendered parameter
     if (total < 0 || paymentMethod.isEmpty || cartItems.isEmpty) {
       throw Exception('Invalid transaction data');
     }
 
     final db = await database;
     return await db.transaction((txn) async {
-      final change = paymentMethod == 'Cash' ? (cashTendered - total) : 0.0; // Calculate change
+      final change = paymentMethod == 'Cash'
+          ? (cashTendered - total)
+          : 0.0; // Calculate change
       final transactionId = await txn.insert('transactions', {
         'timestamp': DateTime.now().toIso8601String(),
         'total': total,
@@ -228,7 +234,8 @@ class DatabaseService {
     });
   }
 
-  Future<List<Map<String, dynamic>>> getTransactionItems(int transactionId) async {
+  Future<List<Map<String, dynamic>>> getTransactionItems(
+      int transactionId) async {
     final db = await database;
     final items = await db.query(
       'transaction_items',
@@ -243,7 +250,9 @@ class DatabaseService {
         whereArgs: [item['product_id']],
       );
       cartItems.add({
-        'product': productResult.isNotEmpty ? Product.fromMap(productResult.first).toMap() : {'name': 'Unknown', 'price': item['price']},
+        'product': productResult.isNotEmpty
+            ? Product.fromMap(productResult.first).toMap()
+            : {'name': 'Unknown', 'price': item['price']},
         'quantity': item['quantity'],
       });
     }
@@ -261,7 +270,8 @@ class DatabaseService {
     return transactions;
   }
 
-  Future<List<Transaction>> getTransactionsByPeriod(DateTime start, DateTime end) async {
+  Future<List<Transaction>> getTransactionsByPeriod(
+      DateTime start, DateTime end) async {
     final db = await database;
     final result = await db.query(
       'transactions',
@@ -276,7 +286,8 @@ class DatabaseService {
     return transactions;
   }
 
-  Future<List<Map<String, dynamic>>> getTopSellingProducts([DateTime? start, DateTime? end]) async {
+  Future<List<Map<String, dynamic>>> getTopSellingProducts(
+      [DateTime? start, DateTime? end]) async {
     final db = await database;
     String query = '''
       SELECT p.name, SUM(ti.quantity) as quantity, SUM(ti.quantity * ti.price) as total_sales

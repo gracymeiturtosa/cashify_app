@@ -18,7 +18,10 @@ class DashboardScreen extends StatelessWidget {
       appBar: AppBar(
         title: Text(
           'Cashify App',
-          style: Theme.of(context).textTheme.headlineLarge!.copyWith(color: Colors.black), // Already black
+          style: Theme.of(context)
+              .textTheme
+              .headlineLarge!
+              .copyWith(color: Colors.black), // Already black
         ),
         backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
@@ -51,7 +54,8 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.add_shopping_cart,
                       onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const TransactionScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => const TransactionScreen()),
                           )),
                 ),
                 const SizedBox(height: 20.0),
@@ -62,7 +66,9 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.inventory,
                       onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const InventoryManagementScreen()),
+                            MaterialPageRoute(
+                                builder: (_) =>
+                                    const InventoryManagementScreen()),
                           )),
                 ),
                 const SizedBox(height: 20.0),
@@ -73,7 +79,8 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.bar_chart,
                       onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const SalesReportScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => const SalesReportScreen()),
                           )),
                 ),
                 const SizedBox(height: 20.0),
@@ -84,7 +91,8 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.settings,
                       onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => const SettingsScreen()),
                           )),
                 ),
                 const SizedBox(height: 20.0),
@@ -95,7 +103,8 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.logout,
                       onPressed: () => Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(builder: (_) => const LoginScreen()),
+                            MaterialPageRoute(
+                                builder: (_) => const LoginScreen()),
                             (route) => false,
                           )),
                 ),
@@ -108,7 +117,9 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildMenuButton(BuildContext context,
-      {required String title, required IconData icon, required VoidCallback onPressed}) {
+      {required String title,
+      required IconData icon,
+      required VoidCallback onPressed}) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, size: 28.0),
@@ -154,7 +165,8 @@ class DashboardScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.info, color: Colors.white),
-            title: Text('About the App', style: Theme.of(context).textTheme.bodyMedium),
+            title: Text('About the App',
+                style: Theme.of(context).textTheme.bodyMedium),
             onTap: () {
               Navigator.pop(context);
               _showAboutDialog(context);
@@ -162,7 +174,8 @@ class DashboardScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.verified, color: Colors.white),
-            title: Text('Version', style: Theme.of(context).textTheme.bodyMedium),
+            title:
+                Text('Version', style: Theme.of(context).textTheme.bodyMedium),
             onTap: () {
               Navigator.pop(context);
               _showVersionDialog(context);
@@ -170,7 +183,8 @@ class DashboardScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.rule, color: Colors.white),
-            title: Text('Rules and Regulations', style: Theme.of(context).textTheme.bodyMedium),
+            title: Text('Rules and Regulations',
+                style: Theme.of(context).textTheme.bodyMedium),
             onTap: () {
               Navigator.pop(context);
               _showRulesDialog(context);
@@ -178,7 +192,8 @@ class DashboardScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.group, color: Colors.white),
-            title: Text('Our Team', style: Theme.of(context).textTheme.bodyMedium),
+            title:
+                Text('Our Team', style: Theme.of(context).textTheme.bodyMedium),
             onTap: () {
               Navigator.pop(context);
               _showTeamDialog(context);
@@ -194,7 +209,8 @@ class DashboardScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E231F),
-        title: Text('About the App', style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('About the App',
+            style: Theme.of(context).textTheme.headlineMedium),
         content: Text(
           'Cashify is a versatile Point of Sale (POS) application designed to streamline transactions, manage inventory, and generate sales reports for any retail business.',
           style: Theme.of(context).textTheme.bodyMedium,
@@ -214,7 +230,8 @@ class DashboardScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E231F),
-        title: Text('Version', style: Theme.of(context).textTheme.headlineMedium),
+        title:
+            Text('Version', style: Theme.of(context).textTheme.headlineMedium),
         content: Text(
           'Cashify App Version: 1.0.0+1',
           style: Theme.of(context).textTheme.bodyMedium,
@@ -234,7 +251,8 @@ class DashboardScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E231F),
-        title: Text('Rules and Regulations', style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('Rules and Regulations',
+            style: Theme.of(context).textTheme.headlineMedium),
         content: SingleChildScrollView(
           child: Text(
             '''
@@ -262,7 +280,8 @@ class DashboardScreen extends StatelessWidget {
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E231F),
-        title: Text('Our Team', style: Theme.of(context).textTheme.headlineMedium),
+        title:
+            Text('Our Team', style: Theme.of(context).textTheme.headlineMedium),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -274,7 +293,10 @@ class DashboardScreen extends StatelessWidget {
               ),
               Text(
                 'Coder and Designer',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFF868685)),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: const Color(0xFF868685)),
               ),
               const SizedBox(height: 16),
               Text(
@@ -283,7 +305,10 @@ class DashboardScreen extends StatelessWidget {
               ),
               Text(
                 'Coder and Designer',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFF868685)),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: const Color(0xFF868685)),
               ),
               const SizedBox(height: 16),
               Text(
@@ -292,7 +317,10 @@ class DashboardScreen extends StatelessWidget {
               ),
               Text(
                 'Coder and Debugger',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFF868685)),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: const Color(0xFF868685)),
               ),
               const SizedBox(height: 16),
               Text(
@@ -301,7 +329,10 @@ class DashboardScreen extends StatelessWidget {
               ),
               Text(
                 'Coder and Designer',
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFF868685)),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: const Color(0xFF868685)),
               ),
             ],
           ),

@@ -76,7 +76,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
       appBar: AppBar(
         title: Text(
           'New Transaction',
-          style: Theme.of(context).textTheme.headlineLarge!.copyWith(color: Colors.black),
+          style: Theme.of(context)
+              .textTheme
+              .headlineLarge!
+              .copyWith(color: Colors.black),
         ),
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
@@ -162,7 +165,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                   final product = filteredProducts[index];
                                   _quantityControllers.putIfAbsent(
                                     product.id,
-                                    () => TextEditingController(), // No default value
+                                    () =>
+                                        TextEditingController(), // No default value
                                   );
                                   return Card(
                                     child: ListTile(
@@ -175,8 +179,10 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                           SizedBox(
                                             width: 60,
                                             child: TextField(
-                                              controller: _quantityControllers[product.id],
-                                              keyboardType: TextInputType.number,
+                                              controller: _quantityControllers[
+                                                  product.id],
+                                              keyboardType:
+                                                  TextInputType.number,
                                               decoration: const InputDecoration(
                                                 hintText: 'Qty',
                                                 border: OutlineInputBorder(),
@@ -184,16 +190,22 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                             ),
                                           ),
                                           IconButton(
-                                            icon: const Icon(Icons.add_shopping_cart),
+                                            icon: const Icon(
+                                                Icons.add_shopping_cart),
                                             onPressed: () {
                                               final qty = int.tryParse(
-                                                      _quantityControllers[product.id]!.text) ??
+                                                      _quantityControllers[
+                                                              product.id]!
+                                                          .text) ??
                                                   1; // Default to 1 if empty or invalid
-                                              final success = provider.addToCart(product, qty);
+                                              final success = provider
+                                                  .addToCart(product, qty);
                                               if (!success && context.mounted) {
-                                                ScaffoldMessenger.of(context).showSnackBar(
+                                                ScaffoldMessenger.of(context)
+                                                    .showSnackBar(
                                                   SnackBar(
-                                                    content: Text(provider.errorMessage ??
+                                                    content: Text(provider
+                                                            .errorMessage ??
                                                         'Failed to add to cart'),
                                                   ),
                                                 );
@@ -227,7 +239,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                         'Qty: $quantity | ₱${(product.price * quantity).toStringAsFixed(2)}'),
                                     trailing: IconButton(
                                       icon: const Icon(Icons.remove_circle),
-                                      onPressed: () => provider.removeFromCart(index),
+                                      onPressed: () =>
+                                          provider.removeFromCart(index),
                                     ),
                                   );
                                 },
@@ -235,7 +248,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
                             ),
                             SizedBox(height: constraints.maxHeight * 0.02),
                             Container(
-                              padding: EdgeInsets.all(constraints.maxWidth * 0.03),
+                              padding:
+                                  EdgeInsets.all(constraints.maxWidth * 0.03),
                               decoration: BoxDecoration(
                                 color: Theme.of(context).colorScheme.surface,
                                 borderRadius: BorderRadius.circular(12),
@@ -251,7 +265,8 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                         .copyWith(fontWeight: FontWeight.bold),
                                     textAlign: TextAlign.center,
                                   ),
-                                  SizedBox(height: constraints.maxHeight * 0.015),
+                                  SizedBox(
+                                      height: constraints.maxHeight * 0.015),
                                   TextField(
                                     controller: _cashController,
                                     decoration: InputDecoration(
@@ -260,43 +275,67 @@ class _TransactionScreenState extends State<TransactionScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                     ),
-                                    keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                            decimal: true),
                                     onChanged: (value) => setState(() {}),
                                   ),
-                                  SizedBox(height: constraints.maxHeight * 0.015),
+                                  SizedBox(
+                                      height: constraints.maxHeight * 0.015),
                                   Consumer<TransactionProvider>(
                                     builder: (context, provider, child) {
-                                      double cash = double.tryParse(_cashController.text) ?? 0.0;
+                                      double cash = double.tryParse(
+                                              _cashController.text) ??
+                                          0.0;
                                       double change = cash - provider.total;
                                       return Text(
                                         'Change: ₱${change >= 0 ? change.toStringAsFixed(2) : 'Insufficient'}',
-                                        style: Theme.of(context).textTheme.bodyLarge!.copyWith(
-                                              color: change >= 0 ? Colors.green : Colors.red,
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .bodyLarge!
+                                            .copyWith(
+                                              color: change >= 0
+                                                  ? Colors.green
+                                                  : Colors.red,
                                             ),
                                         textAlign: TextAlign.center,
                                       );
                                     },
                                   ),
-                                  SizedBox(height: constraints.maxHeight * 0.015),
+                                  SizedBox(
+                                      height: constraints.maxHeight * 0.015),
                                   PaymentProcessingWidget(
                                     onComplete: () async {
-                                      final cashTendered = double.tryParse(_cashController.text) ?? 0.0;
-                                      final transactionDetails = await provider.completeTransaction(
+                                      final cashTendered = double.tryParse(
+                                              _cashController.text) ??
+                                          0.0;
+                                      final transactionDetails =
+                                          await provider.completeTransaction(
                                         context,
                                         cashTendered: cashTendered,
                                       );
-                                      if (context.mounted && transactionDetails['transactionId'] != -1) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Transaction Completed')),
+                                      if (context.mounted &&
+                                          transactionDetails['transactionId'] !=
+                                              -1) {
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  'Transaction Completed')),
                                         );
                                         showDialog(
                                           context: context,
-                                          builder: (_) => ReceiptWidget(transactionDetails: transactionDetails),
+                                          builder: (_) => ReceiptWidget(
+                                              transactionDetails:
+                                                  transactionDetails),
                                         ).then((_) => Navigator.pop(context));
                                       } else if (context.mounted) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
                                           SnackBar(
-                                            content: Text(provider.errorMessage ?? 'Transaction failed'),
+                                            content: Text(
+                                                provider.errorMessage ??
+                                                    'Transaction failed'),
                                           ),
                                         );
                                       }
