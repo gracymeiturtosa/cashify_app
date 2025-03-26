@@ -70,8 +70,7 @@ class _MyAppState extends State<MyApp> {
             backgroundColor: const Color(0xFF9FE870), // Bright Green
             foregroundColor: const Color(0xFF163300), // Forest Green
             padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             elevation: 4,
             textStyle: GoogleFonts.inter(
               fontSize: 18,
@@ -83,9 +82,7 @@ class _MyAppState extends State<MyApp> {
         switchTheme: SwitchThemeData(
           thumbColor: WidgetStateProperty.all(const Color(0xFFFFFFFF)),
           trackColor: WidgetStateProperty.resolveWith(
-            (states) => states.contains(WidgetState.selected)
-                ? const Color(0xFF163300)
-                : Colors.grey,
+            (states) => states.contains(WidgetState.selected) ? const Color(0xFF163300) : Colors.grey,
           ),
         ),
         colorScheme: const ColorScheme.dark(

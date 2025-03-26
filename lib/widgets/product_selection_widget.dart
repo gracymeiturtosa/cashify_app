@@ -30,8 +30,7 @@ class _ProductSelectionWidgetState extends State<ProductSelectionWidget> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final productsToDisplay =
-            widget.filteredProducts ?? transactionProvider.products;
+        final productsToDisplay = widget.filteredProducts ?? transactionProvider.products;
 
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -40,9 +39,7 @@ class _ProductSelectionWidgetState extends State<ProductSelectionWidget> {
             Flexible(
               fit: FlexFit.loose,
               child: productsToDisplay.isEmpty
-                  ? Center(
-                      child: Text('No matching products',
-                          style: Theme.of(context).textTheme.bodyMedium))
+                  ? Center(child: Text('No matching products', style: Theme.of(context).textTheme.bodyMedium))
                   : ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
@@ -53,17 +50,13 @@ class _ProductSelectionWidgetState extends State<ProductSelectionWidget> {
                           product.hashCode,
                           () => TextEditingController(),
                         );
-                        final quantityController =
-                            _quantityControllers[product.hashCode]!;
+                        final quantityController = _quantityControllers[product.hashCode]!;
 
                         return Card(
                           elevation: 2,
                           margin: const EdgeInsets.symmetric(vertical: 4.0),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          color: Theme.of(context)
-                              .colorScheme
-                              .surface, // Lighter Base Dark
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          color: Theme.of(context).colorScheme.surface, // Lighter Base Dark
                           child: Padding(
                             padding: const EdgeInsets.all(12.0),
                             child: Row(
@@ -73,15 +66,12 @@ class _ProductSelectionWidgetState extends State<ProductSelectionWidget> {
                                   flex: 2,
                                   fit: FlexFit.tight,
                                   child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         product.name,
-                                        style: Theme.of(context)
-                                            .textTheme
-                                            .headlineSmall,
+                                        style: Theme.of(context).textTheme.headlineSmall,
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                       ),
@@ -91,9 +81,7 @@ class _ProductSelectionWidgetState extends State<ProductSelectionWidget> {
                                         style: Theme.of(context)
                                             .textTheme
                                             .bodyMedium!
-                                            .copyWith(
-                                                color: const Color(
-                                                    0xFF868685)), // Interactive Secondary
+                                            .copyWith(color: const Color(0xFF868685)), // Interactive Secondary
                                         overflow: TextOverflow.ellipsis,
                                         maxLines: 1,
                                       ),
@@ -116,35 +104,23 @@ class _ProductSelectionWidgetState extends State<ProductSelectionWidget> {
                                             hintStyle: Theme.of(context)
                                                 .textTheme
                                                 .bodyMedium!
-                                                .copyWith(
-                                                    color: const Color(
-                                                        0xFF868685)),
+                                                .copyWith(color: const Color(0xFF868685)),
                                             border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
+                                              borderRadius: BorderRadius.circular(8),
                                               borderSide: const BorderSide(
-                                                color: Color(
-                                                    0xFF868685), // Interactive Secondary
+                                                color: Color(0xFF868685), // Interactive Secondary
                                               ),
                                             ),
-                                            contentPadding:
-                                                const EdgeInsets.symmetric(
-                                                    horizontal: 8,
-                                                    vertical: 12),
+                                            contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 12),
                                           ),
                                           textAlign: TextAlign.center,
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyLarge,
+                                          style: Theme.of(context).textTheme.bodyLarge,
                                         ),
                                       ),
                                       const SizedBox(width: 8),
                                       IconButton(
-                                        icon:
-                                            const Icon(Icons.add_shopping_cart),
-                                        color: Theme.of(context)
-                                            .colorScheme
-                                            .secondary, // Forest Green
+                                        icon: const Icon(Icons.add_shopping_cart),
+                                        color: Colors.white, // Changed from Forest Green to White
                                         iconSize: 28,
                                         padding: EdgeInsets.zero,
                                         constraints: const BoxConstraints(),
@@ -181,8 +157,7 @@ class _ProductSelectionWidgetState extends State<ProductSelectionWidget> {
     if (quantity <= 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please enter a valid quantity',
-              style: Theme.of(context).textTheme.bodyMedium),
+          content: Text('Please enter a valid quantity', style: Theme.of(context).textTheme.bodyMedium),
           duration: const Duration(seconds: 2),
         ),
       );
@@ -200,8 +175,7 @@ class _ProductSelectionWidgetState extends State<ProductSelectionWidget> {
             duration: const Duration(seconds: 2),
             action: SnackBarAction(
               label: 'OK',
-              textColor:
-                  Theme.of(context).colorScheme.secondary, // Forest Green
+              textColor: Theme.of(context).colorScheme.secondary, // Forest Green
               onPressed: () {
                 ScaffoldMessenger.of(context).hideCurrentSnackBar();
               },

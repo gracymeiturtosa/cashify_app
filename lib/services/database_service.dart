@@ -1,12 +1,11 @@
 import 'dart:io';
-import 'package:flutter/foundation.dart'; // For debugPrint
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart' as sqflite;
-import 'package:sqflite_common_ffi/sqflite_ffi.dart'
-    as ffi; // Alias for sqflite_common_ffi
+import 'package:sqflite_common_ffi/sqflite_ffi.dart' as ffi;
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import '../models/product_model.dart';
-import '../models/transaction_model.dart'; // Uses your Transaction class
+import '../models/transaction_model.dart';
 import '../models/user_model.dart';
 
 class DatabaseService {
@@ -29,20 +28,20 @@ class DatabaseService {
       debugPrint('Database path: $path');
 
       if (Platform.isWindows || Platform.isMacOS || Platform.isLinux) {
-        // Desktop: Use sqflite_common_ffi with alias
         return await ffi.databaseFactoryFfi.openDatabase(
           path,
           options: ffi.OpenDatabaseOptions(
-            version: 1,
+            version: 2, // Increment version for migration
             onCreate: _onCreate,
+            onUpgrade: _onUpgrade, // Add migration handler
           ),
         );
       } else {
-        // Android/iOS: Use sqflite natively
         return await sqflite.openDatabase(
           path,
-          version: 1,
+          version: 2, // Increment version for migration
           onCreate: _onCreate,
+          onUpgrade: _onUpgrade, // Add migration handler
         );
       }
     } catch (e) {
@@ -73,7 +72,8 @@ class DatabaseService {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         timestamp TEXT NOT NULL,
         total REAL NOT NULL,
-        payment_method TEXT NOT NULL
+        payment_method TEXT NOT NULL,
+        change REAL NOT NULL DEFAULT 0.0 -- Added change column
       )
     ''');
     await db.execute('''
@@ -102,8 +102,16 @@ class DatabaseService {
     debugPrint('Database initialized with default data');
   }
 
+  Future<void> _onUpgrade(sqflite.Database db, int oldVersion, int newVersion) async {
+    debugPrint('Upgrading database from version $oldVersion to $newVersion');
+    if (oldVersion < 2) {
+      await db.execute('ALTER TABLE transactions ADD COLUMN change REAL NOT NULL DEFAULT 0.0');
+      debugPrint('Added change column to transactions table');
+    }
+  }
+
   Future<void> init() async {
-    await database; // Ensure database is initialized
+    await database;
   }
 
   Future<List<User>> login(String username, String password) async {
@@ -124,18 +132,15 @@ class DatabaseService {
 
   Future<void> insertProduct(String name, double price, int stock) async {
     if (name.isEmpty || price < 0 || stock < 0) {
-      throw Exception(
-          'Invalid product data: name must not be empty, price and stock must be non-negative');
+      throw Exception('Invalid product data');
     }
     final db = await database;
     await db.insert('products', {'name': name, 'price': price, 'stock': stock});
   }
 
-  Future<void> updateProduct(
-      int id, String name, double price, int stock) async {
+  Future<void> updateProduct(int id, String name, double price, int stock) async {
     if (name.isEmpty || price < 0 || stock < 0) {
-      throw Exception(
-          'Invalid product data: name must not be empty, price and stock must be non-negative');
+      throw Exception('Invalid product data');
     }
     final db = await database;
     final rowsAffected = await db.update(
@@ -177,19 +182,23 @@ class DatabaseService {
     }
   }
 
-  Future<Map<String, dynamic>> insertTransaction(double total,
-      String paymentMethod, List<Map<String, dynamic>> cartItems) async {
+  Future<Map<String, dynamic>> insertTransaction(
+      double total,
+      String paymentMethod,
+      List<Map<String, dynamic>> cartItems,
+      double cashTendered) async { // Added cashTendered parameter
     if (total < 0 || paymentMethod.isEmpty || cartItems.isEmpty) {
-      throw Exception(
-          'Invalid transaction data: total must be non-negative, payment method and cart required');
+      throw Exception('Invalid transaction data');
     }
 
     final db = await database;
     return await db.transaction((txn) async {
+      final change = paymentMethod == 'Cash' ? (cashTendered - total) : 0.0; // Calculate change
       final transactionId = await txn.insert('transactions', {
         'timestamp': DateTime.now().toIso8601String(),
         'total': total,
         'payment_method': paymentMethod,
+        'change': change, // Store change
       });
 
       for (var item in cartItems) {
@@ -214,29 +223,60 @@ class DatabaseService {
         'total': total,
         'cart': cartItems,
         'paymentMethod': paymentMethod,
+        'change': change, // Return change
       };
     });
+  }
+
+  Future<List<Map<String, dynamic>>> getTransactionItems(int transactionId) async {
+    final db = await database;
+    final items = await db.query(
+      'transaction_items',
+      where: 'transaction_id = ?',
+      whereArgs: [transactionId],
+    );
+    final List<Map<String, dynamic>> cartItems = [];
+    for (var item in items) {
+      final productResult = await db.query(
+        'products',
+        where: 'id = ?',
+        whereArgs: [item['product_id']],
+      );
+      cartItems.add({
+        'product': productResult.isNotEmpty ? Product.fromMap(productResult.first).toMap() : {'name': 'Unknown', 'price': item['price']},
+        'quantity': item['quantity'],
+      });
+    }
+    return cartItems;
   }
 
   Future<List<Transaction>> getTransactions() async {
     final db = await database;
     final result = await db.query('transactions');
-    return result.map((map) => Transaction.fromMap(map)).toList();
+    final transactions = result.map((map) => Transaction.fromMap(map)).toList();
+    for (var i = 0; i < transactions.length; i++) {
+      final cart = await getTransactionItems(transactions[i].id);
+      transactions[i] = transactions[i].copyWith(cart: cart);
+    }
+    return transactions;
   }
 
-  Future<List<Transaction>> getTransactionsByPeriod(
-      DateTime start, DateTime end) async {
+  Future<List<Transaction>> getTransactionsByPeriod(DateTime start, DateTime end) async {
     final db = await database;
     final result = await db.query(
       'transactions',
       where: 'timestamp >= ? AND timestamp <= ?',
       whereArgs: [start.toIso8601String(), end.toIso8601String()],
     );
-    return result.map((map) => Transaction.fromMap(map)).toList();
+    final transactions = result.map((map) => Transaction.fromMap(map)).toList();
+    for (var i = 0; i < transactions.length; i++) {
+      final cart = await getTransactionItems(transactions[i].id);
+      transactions[i] = transactions[i].copyWith(cart: cart);
+    }
+    return transactions;
   }
 
-  Future<List<Map<String, dynamic>>> getTopSellingProducts(
-      [DateTime? start, DateTime? end]) async {
+  Future<List<Map<String, dynamic>>> getTopSellingProducts([DateTime? start, DateTime? end]) async {
     final db = await database;
     String query = '''
       SELECT p.name, SUM(ti.quantity) as quantity, SUM(ti.quantity * ti.price) as total_sales
@@ -284,6 +324,16 @@ class DatabaseService {
         throw Exception('Failed to update settings');
       }
     }
+  }
+
+  Future<void> debugDatabase() async {
+    final db = await database;
+    final transactions = await db.query('transactions');
+    final items = await db.query('transaction_items');
+    final products = await db.query('products');
+    debugPrint('All transactions: $transactions');
+    debugPrint('All transaction items: $items');
+    debugPrint('All products: $products');
   }
 
   Future<void> close() async {

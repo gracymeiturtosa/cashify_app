@@ -12,8 +12,10 @@ class SettingsScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title:
-            Text('Settings', style: Theme.of(context).textTheme.headlineLarge),
+        title: Text(
+          'Settings',
+          style: Theme.of(context).textTheme.headlineLarge!.copyWith(color: Colors.black), // Changed to black
+        ),
       ),
       body: Center(
         child: Padding(
@@ -23,10 +25,8 @@ class SettingsScreen extends StatelessWidget {
             constraints: const BoxConstraints(minWidth: 300, maxWidth: 600),
             padding: const EdgeInsets.all(24.0),
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface, // Lighter Base Dark
-              border: Border.all(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
+              color: Theme.of(context).colorScheme.surface,
+              border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
               borderRadius: BorderRadius.circular(8.0),
               boxShadow: [
                 BoxShadow(
@@ -43,24 +43,20 @@ class SettingsScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     SwitchListTile(
-                      title: Text('Accept Cash Payments',
-                          style: Theme.of(context).textTheme.headlineSmall),
+                      title: Text('Accept Cash Payments', style: Theme.of(context).textTheme.headlineSmall),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                       value: transactionProvider.cashEnabled,
                       onChanged: (value) {
-                        transactionProvider.updateLocalSettings(
-                            value, transactionProvider.cardEnabled);
+                        transactionProvider.updateLocalSettings(value, transactionProvider.cardEnabled);
                       },
                     ),
                     const SizedBox(height: 24.0),
                     SwitchListTile(
-                      title: Text('Accept Card Payments',
-                          style: Theme.of(context).textTheme.headlineSmall),
+                      title: Text('Accept Card Payments', style: Theme.of(context).textTheme.headlineSmall),
                       contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                       value: transactionProvider.cardEnabled,
                       onChanged: (value) {
-                        transactionProvider.updateLocalSettings(
-                            transactionProvider.cashEnabled, value);
+                        transactionProvider.updateLocalSettings(transactionProvider.cashEnabled, value);
                       },
                     ),
                     const SizedBox(height: 24.0),
@@ -80,9 +76,7 @@ class SettingsScreen extends StatelessWidget {
                                   if (context.mounted) {
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text(
-                                              'Settings saved successfully')),
+                                      const SnackBar(content: Text('Settings saved successfully')),
                                     );
                                   }
                                 } catch (e) {
@@ -90,11 +84,8 @@ class SettingsScreen extends StatelessWidget {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                         content: Text(
-                                          transactionProvider.errorMessage ??
-                                              'Error saving settings',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .bodyMedium,
+                                          transactionProvider.errorMessage ?? 'Error saving settings',
+                                          style: Theme.of(context).textTheme.bodyMedium,
                                         ),
                                       ),
                                     );
@@ -105,11 +96,9 @@ class SettingsScreen extends StatelessWidget {
                             ? const SizedBox(
                                 width: 20,
                                 height: 20,
-                                child: CircularProgressIndicator(
-                                    color: Color(0xFF163300)),
+                                child: CircularProgressIndicator(color: Color(0xFF163300)),
                               )
-                            : Text('Save',
-                                style: Theme.of(context).textTheme.labelLarge),
+                            : Text('Save', style: Theme.of(context).textTheme.labelLarge),
                       ),
                     ),
                   ],

@@ -60,8 +60,7 @@ class InventoryProvider with ChangeNotifier {
     }
   }
 
-  Future<bool> updateProduct(
-      int id, String name, double price, int stock) async {
+  Future<bool> updateProduct(int id, String name, double price, int stock) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
