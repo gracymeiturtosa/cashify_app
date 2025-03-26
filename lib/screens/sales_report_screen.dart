@@ -83,7 +83,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-              'Ukay Ukay Receipt',
+              'Cashify Receipt',
               style: pw.TextStyle(
                 fontSize: 28,
                 fontWeight: pw.FontWeight.bold,
@@ -174,7 +174,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
             pw.Divider(),
             pw.SizedBox(height: 8),
             pw.Text(
-              'Thank you for shopping at Ukay Ukay!',
+              'Thank you for shopping!',
               style: pw.TextStyle(
                   fontSize: 12, font: font, color: PdfColors.grey700),
               textAlign: pw.TextAlign.center,
@@ -210,7 +210,7 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
-              'Ukay Ukay Sales Report',
+              'Cashify Sales Report',
               style: pw.TextStyle(
                 fontSize: 28,
                 fontWeight: pw.FontWeight.bold,
