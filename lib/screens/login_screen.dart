@@ -28,7 +28,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Login', style: Theme.of(context).textTheme.headlineLarge),
+        title: Text(
+          'Login',
+          style: Theme.of(context).textTheme.headlineLarge!.copyWith(color: Colors.black), // Changed to black
+        ),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -38,15 +41,9 @@ class _LoginScreenState extends State<LoginScreen> {
               return Container(
                 padding: const EdgeInsets.all(20.0),
                 decoration: BoxDecoration(
-                  border: Border.all(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .onSurface
-                          .withOpacity(0.2)),
+                  border: Border.all(color: Theme.of(context).colorScheme.onSurface.withOpacity(0.2)),
                   borderRadius: BorderRadius.circular(10.0),
-                  color: Theme.of(context)
-                      .colorScheme
-                      .surface, // Lighter Base Dark
+                  color: Theme.of(context).colorScheme.surface,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.2),
@@ -88,10 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const SizedBox(height: 16.0),
                       Text(
                         authProvider.errorMessage!,
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyMedium!
-                            .copyWith(color: const Color(0xFFA8200D)),
+                        style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFFA8200D)),
                       ),
                     ],
                     const SizedBox(height: 20.0),
@@ -106,9 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               if (success && context.mounted) {
                                 Navigator.pushReplacement(
                                   context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const DashboardScreen()),
+                                  MaterialPageRoute(builder: (context) => const DashboardScreen()),
                                 );
                               }
                             },
@@ -116,11 +108,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(
-                                  color: Color(0xFF163300)),
+                              child: CircularProgressIndicator(color: Color(0xFF163300)),
                             )
-                          : Text('Login',
-                              style: Theme.of(context).textTheme.labelLarge),
+                          : Text('Login', style: Theme.of(context).textTheme.labelLarge),
                     ),
                   ],
                 ),

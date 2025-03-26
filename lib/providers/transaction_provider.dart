@@ -120,7 +120,7 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Map<String, dynamic>> completeTransaction(BuildContext context) async {
+  Future<Map<String, dynamic>> completeTransaction(BuildContext context, {required double cashTendered}) async {
     if (_cart.isEmpty) {
       _errorMessage = 'Cart is empty';
       notifyListeners();
@@ -129,6 +129,20 @@ class TransactionProvider with ChangeNotifier {
         'total': 0.0,
         'cart': [],
         'paymentMethod': _paymentMethod,
+        'change': 0.0,
+      };
+    }
+
+    if (_paymentMethod == 'Cash' && cashTendered < _total) {
+      _errorMessage = 'Insufficient cash tendered';
+      _isLoading = false;
+      notifyListeners();
+      return {
+        'transactionId': -1,
+        'total': 0.0,
+        'cart': [],
+        'paymentMethod': _paymentMethod,
+        'change': 0.0,
       };
     }
 
@@ -137,6 +151,7 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
 
     try {
+<<<<<<< HEAD
       // Preserve cart data before clearing
       final cartCopy = List<Map<String, dynamic>>.from(_cart);
 
@@ -156,6 +171,25 @@ class TransactionProvider with ChangeNotifier {
       };
 
       // Clear cart and reset total only after successful transaction
+=======
+      final cartCopy = List<Map<String, dynamic>>.from(_cart);
+      
+      final transactionDetails = await _dbService.insertTransaction(
+        _total,
+        _paymentMethod,
+        cartCopy,
+        cashTendered, // Pass cashTendered to DatabaseService
+      );
+
+      final result = {
+        'transactionId': transactionDetails['transactionId'] ?? -1,
+        'total': _total,
+        'cart': cartCopy,
+        'paymentMethod': _paymentMethod,
+        'change': transactionDetails['change'] as double, // Use change from DatabaseService
+      };
+
+>>>>>>> 9d7be7c8502db62a78fdb8bb41e7e088028d963b
       _cart.clear();
       _total = 0.0;
       await _loadProducts();
@@ -178,6 +212,7 @@ class TransactionProvider with ChangeNotifier {
         'total': 0.0,
         'cart': [], // Empty cart on failure
         'paymentMethod': _paymentMethod,
+        'change': 0.0,
       };
     }
   }

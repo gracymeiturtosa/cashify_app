@@ -16,8 +16,10 @@ class DashboardScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Cashify App',
-            style: Theme.of(context).textTheme.headlineLarge),
+        title: Text(
+          'Cashify App',
+          style: Theme.of(context).textTheme.headlineLarge!.copyWith(color: Colors.black), // Already black
+        ),
         backgroundColor: Theme.of(context).primaryColor,
         centerTitle: true,
         leading: Builder(
@@ -49,21 +51,18 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.add_shopping_cart,
                       onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (_) => const TransactionScreen()),
+                            MaterialPageRoute(builder: (_) => const TransactionScreen()),
                           )),
                 ),
                 const SizedBox(height: 20.0),
                 SizedBox(
                   width: buttonWidth,
                   child: _buildMenuButton(context,
-                      title: 'Inventory Management',
+                      title: 'Stock Management',
                       icon: Icons.inventory,
                       onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (_) =>
-                                    const InventoryManagementScreen()),
+                            MaterialPageRoute(builder: (_) => const InventoryManagementScreen()),
                           )),
                 ),
                 const SizedBox(height: 20.0),
@@ -74,8 +73,7 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.bar_chart,
                       onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (_) => const SalesReportScreen()),
+                            MaterialPageRoute(builder: (_) => const SalesReportScreen()),
                           )),
                 ),
                 const SizedBox(height: 20.0),
@@ -86,8 +84,7 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.settings,
                       onPressed: () => Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (_) => const SettingsScreen()),
+                            MaterialPageRoute(builder: (_) => const SettingsScreen()),
                           )),
                 ),
                 const SizedBox(height: 20.0),
@@ -98,8 +95,7 @@ class DashboardScreen extends StatelessWidget {
                       icon: Icons.logout,
                       onPressed: () => Navigator.pushAndRemoveUntil(
                             context,
-                            MaterialPageRoute(
-                                builder: (_) => const LoginScreen()),
+                            MaterialPageRoute(builder: (_) => const LoginScreen()),
                             (route) => false,
                           )),
                 ),
@@ -112,9 +108,7 @@ class DashboardScreen extends StatelessWidget {
   }
 
   Widget _buildMenuButton(BuildContext context,
-      {required String title,
-      required IconData icon,
-      required VoidCallback onPressed}) {
+      {required String title, required IconData icon, required VoidCallback onPressed}) {
     return ElevatedButton.icon(
       onPressed: onPressed,
       icon: Icon(icon, size: 28.0),
@@ -125,16 +119,15 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // Drawer widget for the hamburger menu
   Widget _buildDrawer(BuildContext context) {
     return Drawer(
-      backgroundColor: const Color(0xFF1E231F), // Lighter Base Dark
+      backgroundColor: const Color(0xFF1E231F),
       child: ListView(
         padding: EdgeInsets.zero,
         children: [
           DrawerHeader(
             decoration: const BoxDecoration(
-              color: Color(0xFF9FE870), // Bright Green
+              color: Color(0xFF9FE870),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -145,7 +138,7 @@ class DashboardScreen extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: const Color(0xFF163300), // Forest Green
+                    color: const Color(0xFF163300),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -161,37 +154,33 @@ class DashboardScreen extends StatelessWidget {
           ),
           ListTile(
             leading: const Icon(Icons.info, color: Colors.white),
-            title: Text('About the App',
-                style: Theme.of(context).textTheme.bodyMedium),
+            title: Text('About the App', style: Theme.of(context).textTheme.bodyMedium),
             onTap: () {
-              Navigator.pop(context); // Close drawer
+              Navigator.pop(context);
               _showAboutDialog(context);
             },
           ),
           ListTile(
             leading: const Icon(Icons.verified, color: Colors.white),
-            title:
-                Text('Version', style: Theme.of(context).textTheme.bodyMedium),
+            title: Text('Version', style: Theme.of(context).textTheme.bodyMedium),
             onTap: () {
-              Navigator.pop(context); // Close drawer
+              Navigator.pop(context);
               _showVersionDialog(context);
             },
           ),
           ListTile(
             leading: const Icon(Icons.rule, color: Colors.white),
-            title: Text('Rules and Regulations',
-                style: Theme.of(context).textTheme.bodyMedium),
+            title: Text('Rules and Regulations', style: Theme.of(context).textTheme.bodyMedium),
             onTap: () {
-              Navigator.pop(context); // Close drawer
+              Navigator.pop(context);
               _showRulesDialog(context);
             },
           ),
           ListTile(
             leading: const Icon(Icons.group, color: Colors.white),
-            title:
-                Text('Our Team', style: Theme.of(context).textTheme.bodyMedium),
+            title: Text('Our Team', style: Theme.of(context).textTheme.bodyMedium),
             onTap: () {
-              Navigator.pop(context); // Close drawer
+              Navigator.pop(context);
               _showTeamDialog(context);
             },
           ),
@@ -200,14 +189,12 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // Dialog for About the App
   void _showAboutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E231F),
-        title: Text('About the App',
-            style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('About the App', style: Theme.of(context).textTheme.headlineMedium),
         content: Text(
           'Cashify is a versatile Point of Sale (POS) application designed to streamline transactions, manage inventory, and generate sales reports for any retail business.',
           style: Theme.of(context).textTheme.bodyMedium,
@@ -222,14 +209,12 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // Dialog for Version
   void _showVersionDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E231F),
-        title:
-            Text('Version', style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('Version', style: Theme.of(context).textTheme.headlineMedium),
         content: Text(
           'Cashify App Version: 1.0.0+1',
           style: Theme.of(context).textTheme.bodyMedium,
@@ -244,14 +229,12 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // Dialog for Rules and Regulations
   void _showRulesDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E231F),
-        title: Text('Rules and Regulations',
-            style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('Rules and Regulations', style: Theme.of(context).textTheme.headlineMedium),
         content: SingleChildScrollView(
           child: Text(
             '''
@@ -274,14 +257,12 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // Dialog for Our Team
   void _showTeamDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF1E231F),
-        title:
-            Text('Our Team', style: Theme.of(context).textTheme.headlineMedium),
+        title: Text('Our Team', style: Theme.of(context).textTheme.headlineMedium),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -293,10 +274,7 @@ class DashboardScreen extends StatelessWidget {
               ),
               Text(
                 'Coder and Designer',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .copyWith(color: const Color(0xFF868685)),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFF868685)),
               ),
               const SizedBox(height: 16),
               Text(
@@ -305,10 +283,25 @@ class DashboardScreen extends StatelessWidget {
               ),
               Text(
                 'Coder and Designer',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodyMedium!
-                    .copyWith(color: const Color(0xFF868685)),
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFF868685)),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Ejos, Justine',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Text(
+                'Coder and Debugger',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFF868685)),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Guintao, Christian Paolo A',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Text(
+                'Coder and Designer',
+                style: Theme.of(context).textTheme.bodyMedium!.copyWith(color: const Color(0xFF868685)),
               ),
             ],
           ),
