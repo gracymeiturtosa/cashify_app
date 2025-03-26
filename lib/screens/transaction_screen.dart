@@ -68,6 +68,12 @@ class _TransactionScreenState extends State<TransactionScreen> {
     );
   }
 
+  // Refresh product list
+  void _refreshProducts(BuildContext context) {
+    final provider = Provider.of<TransactionProvider>(context, listen: false);
+    provider.loadProducts(); // Assuming this method exists or we'll add it
+  }
+
   @override
   Widget build(BuildContext context) {
     Provider.of<TransactionProvider>(context, listen: false);
@@ -83,6 +89,13 @@ class _TransactionScreenState extends State<TransactionScreen> {
         ),
         backgroundColor: Theme.of(context).primaryColor,
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Refresh Products',
+            onPressed: () => _refreshProducts(context),
+          ),
+        ],
       ),
       body: LayoutBuilder(
         builder: (context, constraints) {

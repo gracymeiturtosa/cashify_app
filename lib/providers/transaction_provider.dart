@@ -1,41 +1,41 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import '../services/database_service.dart';
 import '../models/product_model.dart';
-import 'inventory_provider.dart';
+import '../providers/inventory_provider.dart'; // For refreshing inventory after transaction
 
 class TransactionProvider with ChangeNotifier {
   final DatabaseService _dbService = DatabaseService();
   List<Product> _products = [];
-  final List<Map<String, dynamic>> _cart = [];
+  List<Map<String, dynamic>> _cart = [];
   double _total = 0.0;
   String _paymentMethod = 'Cash';
-  bool _cashEnabled = true;
-  bool _cardEnabled = false;
   bool _isLoading = false;
   String? _errorMessage;
+  bool _cashEnabled = true;
+  bool _cardEnabled = true;
 
+  // Getters
   List<Product> get products => _products;
   List<Map<String, dynamic>> get cart => _cart;
   double get total => _total;
-  bool get cashEnabled => _cashEnabled;
-  bool get cardEnabled => _cardEnabled;
   String get paymentMethod => _paymentMethod;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get cashEnabled => _cashEnabled;
+  bool get cardEnabled => _cardEnabled;
 
   TransactionProvider() {
-    _loadProducts();
-    _loadSettings();
+    loadProducts(); // Initial load of products
   }
 
-  Future<void> _loadProducts() async {
+  // Load products from the database
+  Future<void> loadProducts() async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      _products = await _dbService.getProducts();
+      _products = await _dbService.getAllProducts();
       _isLoading = false;
     } catch (e) {
       _errorMessage = 'Failed to load products: $e';
@@ -45,81 +45,52 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> _loadSettings() async {
-    try {
-      final settings = await _dbService.getSettings();
-      _cashEnabled = settings['cash_enabled'] == 1;
-      _cardEnabled = settings['card_enabled'] == 1;
-    } catch (e) {
-      _errorMessage = 'Failed to load settings: $e';
-      _cashEnabled = true;
-      _cardEnabled = false;
-    }
-    notifyListeners();
-  }
-
-  Future<void> refreshProducts() async {
-    await _loadProducts();
-  }
-
-  Future<void> refreshSettings() async {
-    await _loadSettings();
-  }
-
-  void updateLocalSettings(bool cashEnabled, bool cardEnabled) {
-    _cashEnabled = cashEnabled;
-    _cardEnabled = cardEnabled;
-    notifyListeners();
-  }
-
+  // Add product to cart
   bool addToCart(Product product, int quantity) {
     if (quantity <= 0) {
-      _errorMessage = 'Quantity must be greater than 0';
+      _errorMessage = 'Quantity must be greater than zero';
+      notifyListeners();
+      return false;
+    }
+    if (product.stock < quantity) {
+      _errorMessage = 'Insufficient stock for ${product.name}';
       notifyListeners();
       return false;
     }
 
-    final existingItemIndex = _cart.indexWhere(
-      (item) => item['product'].id == product.id,
-    );
-    final currentQuantity =
-        existingItemIndex >= 0 ? _cart[existingItemIndex]['quantity'] : 0;
-    final totalRequestedQuantity = currentQuantity + quantity;
-
-    if (totalRequestedQuantity > product.stock) {
-      _errorMessage =
-          'Not enough stock for ${product.name} (Available: ${product.stock})';
-      notifyListeners();
-      return false;
-    }
-
-    if (existingItemIndex >= 0) {
-      _cart[existingItemIndex]['quantity'] = totalRequestedQuantity;
+    final existingItemIndex =
+        _cart.indexWhere((item) => item['product'].id == product.id);
+    if (existingItemIndex != -1) {
+      _cart[existingItemIndex]['quantity'] += quantity;
     } else {
       _cart.add({'product': product, 'quantity': quantity});
     }
     _total += product.price * quantity;
-    _errorMessage = null;
     notifyListeners();
     return true;
   }
 
+  // Remove product from cart
   void removeFromCart(int index) {
-    if (index >= 0 && index < _cart.length) {
-      final item = _cart[index];
-      _total -= item['product'].price * item['quantity'];
-      _cart.removeAt(index);
-      _errorMessage = null;
+    final item = _cart[index];
+    _total -= item['product'].price * item['quantity'];
+    _cart.removeAt(index);
+    notifyListeners();
+  }
+
+  // Set payment method (if you want to reintroduce explicit selection later)
+  void setPaymentMethod(String method) {
+    if ((method == 'Cash' && _cashEnabled) ||
+        (method == 'Card' && _cardEnabled)) {
+      _paymentMethod = method;
+      notifyListeners();
+    } else {
+      _errorMessage = 'Selected payment method is not enabled';
       notifyListeners();
     }
   }
 
-  void setPaymentMethod(String method) {
-    _paymentMethod = method;
-    _errorMessage = null;
-    notifyListeners();
-  }
-
+  // Complete the transaction
   Future<Map<String, dynamic>> completeTransaction(BuildContext context,
       {required double cashTendered}) async {
     if (_cart.isEmpty) {
@@ -133,6 +104,11 @@ class TransactionProvider with ChangeNotifier {
         'change': 0.0,
       };
     }
+
+    // Infer payment method: "Cash" if cashTendered > 0 and enabled, "Card" otherwise
+    _paymentMethod = cashTendered > 0 && _cashEnabled
+        ? 'Cash'
+        : (_cardEnabled ? 'Card' : 'Cash');
 
     if (_paymentMethod == 'Cash' && cashTendered < _total) {
       _errorMessage = 'Insufficient cash tendered';
@@ -158,7 +134,7 @@ class TransactionProvider with ChangeNotifier {
         _total,
         _paymentMethod,
         cartCopy,
-        cashTendered, // Pass cashTendered to DatabaseService
+        cashTendered,
       );
 
       final result = {
@@ -166,18 +142,19 @@ class TransactionProvider with ChangeNotifier {
         'total': _total,
         'cart': cartCopy,
         'paymentMethod': _paymentMethod,
-        'change': transactionDetails['change']
-            as double, // Use change from DatabaseService
+        'change': transactionDetails['change'] as double,
       };
 
+      // Clear cart and reset total
       _cart.clear();
       _total = 0.0;
-      await _loadProducts();
 
-      final inventoryProvider = Provider.of<InventoryProvider>(
-        context,
-        listen: false,
-      );
+      // Refresh products after transaction
+      await loadProducts();
+
+      // Refresh inventory (if InventoryProvider is used)
+      final inventoryProvider =
+          Provider.of<InventoryProvider>(context, listen: false);
       await inventoryProvider.refreshProducts();
 
       _isLoading = false;
@@ -197,8 +174,21 @@ class TransactionProvider with ChangeNotifier {
     }
   }
 
+  // Clear error message
   void clearError() {
     _errorMessage = null;
+    notifyListeners();
+  }
+
+  // Optionally set payment method availability (if needed elsewhere)
+  void setPaymentOptions({bool cashEnabled = true, bool cardEnabled = true}) {
+    _cashEnabled = cashEnabled;
+    _cardEnabled = cardEnabled;
+    if (!_cashEnabled && _paymentMethod == 'Cash') {
+      _paymentMethod = _cardEnabled ? 'Card' : 'Cash';
+    } else if (!_cardEnabled && _paymentMethod == 'Card') {
+      _paymentMethod = _cashEnabled ? 'Cash' : 'Card';
+    }
     notifyListeners();
   }
 }
