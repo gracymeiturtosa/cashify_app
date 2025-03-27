@@ -334,6 +334,30 @@ class DashboardScreen extends StatelessWidget {
                     .bodyMedium!
                     .copyWith(color: const Color(0xFF868685)),
               ),
+              const SizedBox(height: 16),
+              Text(
+                'Agcopra, Marjorie',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Text(
+                'Coder and Designer',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: const Color(0xFF868685)),
+              ),
+              const SizedBox(height: 16),
+              Text(
+                'Guintao, Christian Paolo A',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Text(
+                'Coder and Designer',
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium!
+                    .copyWith(color: const Color(0xFF868685)),
+              ),
             ],
           ),
         ),
