@@ -17,7 +17,7 @@ class SettingsScreen extends StatelessWidget {
           style: Theme.of(context)
               .textTheme
               .headlineLarge!
-              .copyWith(color: Colors.black), // Changed to black
+              .copyWith(color: Colors.black),
         ),
       ),
       body: Center(
@@ -53,8 +53,10 @@ class SettingsScreen extends StatelessWidget {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                       value: transactionProvider.cashEnabled,
                       onChanged: (value) {
-                        transactionProvider.updateLocalSettings(
-                            value, transactionProvider.cardEnabled);
+                        transactionProvider.setPaymentOptions(
+                          cashEnabled: value,
+                          cardEnabled: transactionProvider.cardEnabled,
+                        ); // Replaced updateLocalSettings with setPaymentOptions
                       },
                     ),
                     const SizedBox(height: 24.0),
@@ -64,8 +66,10 @@ class SettingsScreen extends StatelessWidget {
                       contentPadding: const EdgeInsets.symmetric(horizontal: 0),
                       value: transactionProvider.cardEnabled,
                       onChanged: (value) {
-                        transactionProvider.updateLocalSettings(
-                            transactionProvider.cashEnabled, value);
+                        transactionProvider.setPaymentOptions(
+                          cashEnabled: transactionProvider.cashEnabled,
+                          cardEnabled: value,
+                        ); // Replaced updateLocalSettings with setPaymentOptions
                       },
                     ),
                     const SizedBox(height: 24.0),
@@ -81,7 +85,7 @@ class SettingsScreen extends StatelessWidget {
                                     transactionProvider.cashEnabled,
                                     transactionProvider.cardEnabled,
                                   );
-                                  await transactionProvider.refreshSettings();
+                                  // No need for refreshSettings; state is already updated
                                   if (context.mounted) {
                                     Navigator.pop(context);
                                     ScaffoldMessenger.of(context).showSnackBar(

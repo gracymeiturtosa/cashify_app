@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart'; // For Provider.of<InventoryProvider>
 import '../services/database_service.dart';
 import '../models/product_model.dart';
 import '../providers/inventory_provider.dart'; // For refreshing inventory after transaction
@@ -35,7 +36,8 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      _products = await _dbService.getAllProducts();
+      _products = await _dbService
+          .getProducts(); // Changed from getAllProducts to getProducts
       _isLoading = false;
     } catch (e) {
       _errorMessage = 'Failed to load products: $e';
@@ -78,7 +80,7 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Set payment method (if you want to reintroduce explicit selection later)
+  // Set payment method
   void setPaymentMethod(String method) {
     if ((method == 'Cash' && _cashEnabled) ||
         (method == 'Card' && _cardEnabled)) {
@@ -180,7 +182,7 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Optionally set payment method availability (if needed elsewhere)
+  // Set payment method availability
   void setPaymentOptions({bool cashEnabled = true, bool cardEnabled = true}) {
     _cashEnabled = cashEnabled;
     _cardEnabled = cardEnabled;

@@ -204,9 +204,10 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
     final font = await PdfGoogleFonts.robotoRegular();
 
     doc.addPage(
-      pw.Page(
+      pw.MultiPage(
+        // Changed from pw.Page to pw.MultiPage
         pageFormat: PdfPageFormat.a4,
-        build: (pw.Context context) => pw.Column(
+        header: (pw.Context context) => pw.Column(
           crossAxisAlignment: pw.CrossAxisAlignment.start,
           children: [
             pw.Text(
@@ -230,85 +231,10 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
               style: pw.TextStyle(fontSize: 14, font: font),
             ),
             pw.SizedBox(height: 24),
-            pw.Text(
-              reportProvider.selectedReport == 'Transactions'
-                  ? 'Transactions'
-                  : 'Top Selling Products',
-              style: pw.TextStyle(
-                  fontSize: 16, fontWeight: pw.FontWeight.bold, font: font),
-            ),
-            pw.SizedBox(height: 8),
-            reportProvider.selectedReport == 'Transactions'
-                ? reportProvider.transactions.isEmpty
-                    ? pw.Text(
-                        'No transactions recorded',
-                        style: pw.TextStyle(
-                            fontSize: 12, font: font, color: PdfColors.grey),
-                      )
-                    : pw.Table.fromTextArray(
-                        headers: ['ID', 'Date', 'Total'],
-                        data: reportProvider.transactions.map((t) {
-                          return [
-                            t.id.toString(),
-                            _formatDate(DateTime.parse(t.timestamp)),
-                            '₱${t.total.toStringAsFixed(2)}',
-                          ];
-                        }).toList(),
-                        headerStyle: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                          fontSize: 14,
-                          font: font,
-                          color: PdfColors.black,
-                        ),
-                        cellStyle: pw.TextStyle(fontSize: 12, font: font),
-                        cellAlignment: pw.Alignment.centerRight,
-                        headerDecoration:
-                            const pw.BoxDecoration(color: PdfColors.grey200),
-                        cellPadding: const pw.EdgeInsets.all(4),
-                      )
-                : reportProvider.topSellingProducts.isEmpty
-                    ? pw.Text(
-                        'No top-selling products recorded',
-                        style: pw.TextStyle(
-                            fontSize: 12, font: font, color: PdfColors.grey),
-                      )
-                    : pw.Table.fromTextArray(
-                        headers: ['Product', 'Qty Sold', 'Total Sales'],
-                        data: reportProvider.topSellingProducts.map((p) {
-                          return [
-                            p['name'] ?? 'Unknown Product',
-                            p['quantity'].toString(),
-                            '₱${p['total_sales'].toStringAsFixed(2)}',
-                          ];
-                        }).toList(),
-                        headerStyle: pw.TextStyle(
-                          fontWeight: pw.FontWeight.bold,
-                          fontSize: 14,
-                          font: font,
-                          color: PdfColors.black,
-                        ),
-                        cellStyle: pw.TextStyle(fontSize: 12, font: font),
-                        cellAlignment: pw.Alignment.centerRight,
-                        headerDecoration:
-                            const pw.BoxDecoration(color: PdfColors.grey200),
-                        cellPadding: const pw.EdgeInsets.all(4),
-                      ),
-            pw.SizedBox(height: 24),
-            pw.Column(
-              crossAxisAlignment: pw.CrossAxisAlignment.end,
-              children: [
-                pw.Text(
-                  'Total Sales: ₱${reportProvider.totalSales.toStringAsFixed(2)}',
-                  style: pw.TextStyle(
-                    fontSize: 18,
-                    fontWeight: pw.FontWeight.bold,
-                    font: font,
-                    color: PdfColors.green900,
-                  ),
-                ),
-              ],
-            ),
-            pw.SizedBox(height: 16),
+          ],
+        ),
+        footer: (pw.Context context) => pw.Column(
+          children: [
             pw.Divider(),
             pw.SizedBox(height: 8),
             pw.Text(
@@ -317,8 +243,94 @@ class _SalesReportScreenState extends State<SalesReportScreen> {
                   fontSize: 12, font: font, color: PdfColors.grey700),
               textAlign: pw.TextAlign.center,
             ),
+            pw.SizedBox(height: 8),
+            pw.Text(
+              'Page ${context.pageNumber} of ${context.pagesCount}',
+              style: pw.TextStyle(fontSize: 10, font: font),
+              textAlign: pw.TextAlign.center,
+            ),
           ],
         ),
+        build: (pw.Context context) => [
+          pw.Text(
+            reportProvider.selectedReport == 'Transactions'
+                ? 'Transactions'
+                : 'Top Selling Products',
+            style: pw.TextStyle(
+                fontSize: 16, fontWeight: pw.FontWeight.bold, font: font),
+          ),
+          pw.SizedBox(height: 8),
+          reportProvider.selectedReport == 'Transactions'
+              ? reportProvider.transactions.isEmpty
+                  ? pw.Text(
+                      'No transactions recorded',
+                      style: pw.TextStyle(
+                          fontSize: 12, font: font, color: PdfColors.grey),
+                    )
+                  : pw.Table.fromTextArray(
+                      headers: ['ID', 'Date', 'Total'],
+                      data: reportProvider.transactions.map((t) {
+                        return [
+                          t.id.toString(),
+                          _formatDate(DateTime.parse(t.timestamp)),
+                          '₱${t.total.toStringAsFixed(2)}',
+                        ];
+                      }).toList(),
+                      headerStyle: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 14,
+                        font: font,
+                        color: PdfColors.black,
+                      ),
+                      cellStyle: pw.TextStyle(fontSize: 12, font: font),
+                      cellAlignment: pw.Alignment.centerRight,
+                      headerDecoration:
+                          const pw.BoxDecoration(color: PdfColors.grey200),
+                      cellPadding: const pw.EdgeInsets.all(4),
+                    )
+              : reportProvider.topSellingProducts.isEmpty
+                  ? pw.Text(
+                      'No top-selling products recorded',
+                      style: pw.TextStyle(
+                          fontSize: 12, font: font, color: PdfColors.grey),
+                    )
+                  : pw.Table.fromTextArray(
+                      headers: ['Product', 'Qty Sold', 'Total Sales'],
+                      data: reportProvider.topSellingProducts.map((p) {
+                        return [
+                          p['name'] ?? 'Unknown Product',
+                          p['quantity'].toString(),
+                          '₱${p['total_sales'].toStringAsFixed(2)}',
+                        ];
+                      }).toList(),
+                      headerStyle: pw.TextStyle(
+                        fontWeight: pw.FontWeight.bold,
+                        fontSize: 14,
+                        font: font,
+                        color: PdfColors.black,
+                      ),
+                      cellStyle: pw.TextStyle(fontSize: 12, font: font),
+                      cellAlignment: pw.Alignment.centerRight,
+                      headerDecoration:
+                          const pw.BoxDecoration(color: PdfColors.grey200),
+                      cellPadding: const pw.EdgeInsets.all(4),
+                    ),
+          pw.SizedBox(height: 24),
+          pw.Column(
+            crossAxisAlignment: pw.CrossAxisAlignment.end,
+            children: [
+              pw.Text(
+                'Total Sales: ₱${reportProvider.totalSales.toStringAsFixed(2)}',
+                style: pw.TextStyle(
+                  fontSize: 18,
+                  fontWeight: pw.FontWeight.bold,
+                  font: font,
+                  color: PdfColors.green900,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
 

@@ -85,7 +85,7 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
                 );
                 if (success && context.mounted) {
                   await Provider.of<TransactionProvider>(context, listen: false)
-                      .refreshProducts();
+                      .loadProducts(); // Changed from refreshProducts to loadProducts
                   Navigator.pop(context);
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -140,7 +140,7 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
           style: Theme.of(context)
               .textTheme
               .headlineLarge!
-              .copyWith(color: Colors.black), // Changed to black
+              .copyWith(color: Colors.black),
         ),
         backgroundColor: Theme.of(context).primaryColor,
       ),
@@ -313,7 +313,7 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
                     if (success && context.mounted) {
                       await Provider.of<TransactionProvider>(context,
                               listen: false)
-                          .refreshProducts();
+                          .loadProducts(); // Changed from refreshProducts to loadProducts
                       nameController.clear();
                       priceController.clear();
                       stockController.clear();
@@ -377,7 +377,7 @@ class _InventoryManagementScreenState extends State<InventoryManagementScreen> {
       final success = await inventoryProvider.deleteProduct(product.id);
       if (success && context.mounted) {
         await Provider.of<TransactionProvider>(context, listen: false)
-            .refreshProducts();
+            .loadProducts(); // Changed from refreshProducts to loadProducts
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Product deleted successfully')));
       } else if (context.mounted) {
